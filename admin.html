@@ -1,210 +1,466 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel</title>
-
-<link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">
-
-<style>
-body {
-    margin:0;
-    font-family:'SF Pro Display', sans-serif;
-    background:#0a0a0a;
-    color:#fff;
-}
-
-.admin {
-    display:flex;
-    height:100vh;
-}
-
-.sidebar {
-    width:220px;
-    background:#111;
-    padding:1rem;
-}
-
-.sidebar-item {
-    padding:10px;
-    cursor:pointer;
-    margin-bottom:5px;
-    border-radius:6px;
-}
-
-.sidebar-item.active {
-    background:#222;
-}
-
-.content {
-    flex:1;
-    padding:20px;
-    overflow-y:auto;
-}
-
-.page { display:none; }
-.page.active { display:block; }
-
-.item-card {
-    display:flex;
-    gap:10px;
-    padding:10px;
-    border:1px solid #333;
-    margin-bottom:10px;
-    border-radius:8px;
-    align-items:center;
-}
-
-.item-thumb img {
-    width:60px;
-    height:60px;
-    object-fit:cover;
-    border-radius:6px;
-}
-
-.item-actions button {
-    margin-left:5px;
-}
-
-input, textarea {
-    width:100%;
-    margin-bottom:10px;
-    padding:8px;
-    background:#111;
-    color:#fff;
-    border:1px solid #333;
-}
-
-button {
-    padding:8px 12px;
-    cursor:pointer;
-}
-
-#authGate {
-    display:grid;
-    place-items:center;
-    height:100vh;
-}
-</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Manoj Mandava</title>
+    <link rel="icon" href="./assets/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#0a0a0a;--surface:#111;--surface2:#161616;
+            --accent:#ff6b1a;--accent-dark:rgba(255,107,26,0.1);
+            --text:#fff;--muted:#555;--border:rgba(255,255,255,0.07);
+            --sidebar:220px;
+        }
+        body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased}
+        #authGate{display:grid;place-items:center;min-height:100vh;background:var(--bg)}
+        .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:min(400px,90vw)}
+        .auth-card h2{font-size:1.4rem;font-weight:700;margin-bottom:0.4rem;letter-spacing:-0.03em}
+        .auth-card p{color:var(--muted);font-size:0.85rem;margin-bottom:2rem}
+        .auth-field{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem}
+        .auth-field label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)}
+        .auth-field input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;color:var(--text);font-size:0.9rem;font-family:inherit;transition:border-color 0.2s}
+        .auth-field input:focus{outline:none;border-color:rgba(255,107,26,0.5)}
+        .auth-error{color:#ff4444;font-size:0.82rem;margin-bottom:1rem;min-height:1.2em}
+        .auth-btn{width:100%;background:var(--accent);color:#000;border:none;padding:0.85rem;border-radius:8px;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;font-family:inherit}
+        .auth-btn:hover{background:#ff5500}
+        #adminApp{display:none;min-height:100vh}
+        .admin-layout{display:flex;min-height:100vh}
+        .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+        .sidebar-logo{padding:1.4rem 1.2rem;border-bottom:1px solid var(--border)}
+        .sidebar-logo-text{font-size:1.1rem;font-weight:700;letter-spacing:-0.03em}
+        .sidebar-logo-text span{color:var(--accent)}
+        .sidebar-logo-sub{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem}
+        .sidebar-nav{padding:0.8rem 0.6rem;flex:1}
+        .sidebar-section{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);padding:0.6rem 0.7rem 0.3rem;margin-top:0.5rem}
+        .sidebar-item{display:flex;align-items:center;gap:0.8rem;padding:0.65rem 0.8rem;border-radius:8px;cursor:pointer;font-size:0.85rem;color:var(--muted);transition:all 0.15s;border:none;background:transparent;width:100%;text-align:left;font-family:inherit}
+        .sidebar-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+        .sidebar-item.active{background:var(--accent-dark);color:var(--accent)}
+        .sidebar-item i{width:16px;text-align:center;font-size:0.85rem}
+        .sidebar-footer{padding:0.8rem 0.6rem;border-top:1px solid var(--border)}
+        .admin-main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+        .admin-topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:50}
+        .admin-topbar-title{font-size:0.9rem;font-weight:600;letter-spacing:-0.01em}
+        .admin-content{padding:1.5rem;flex:1}
+        .page{display:none}.page.active{display:block}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem}
+        .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.2rem;text-align:center}
+        .stat-number{font-size:2rem;font-weight:700;color:var(--accent);line-height:1}
+        .stat-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-top:0.4rem}
+        .welcome-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+        .welcome-card h3{font-size:1.1rem;font-weight:600;margin-bottom:0.4rem}
+        .welcome-card p{color:var(--muted);font-size:0.85rem;line-height:1.6}
+        .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.8rem}
+        .page-header h2{font-size:1.1rem;font-weight:600;letter-spacing:-0.02em}
+        .btn{padding:0.55rem 1rem;border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all 0.15s;font-family:inherit;text-transform:uppercase;letter-spacing:0.06em}
+        .btn-primary{background:var(--accent);color:#000;border-color:var(--accent)}
+        .btn-primary:hover{background:#ff5500}
+        .btn-edit{background:rgba(255,255,255,0.06);color:var(--text);border-color:var(--border)}
+        .btn-edit:hover{border-color:rgba(255,255,255,0.2)}
+        .btn-danger{background:rgba(255,50,50,0.1);color:#ff4444;border-color:rgba(255,50,50,0.2)}
+        .btn-danger:hover{background:rgba(255,50,50,0.2)}
+        .btn-ghost{background:transparent;color:var(--muted);border-color:var(--border)}
+        .btn-ghost:hover{color:var(--text)}
+        .form-panel{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.2rem;display:none}
+        .form-panel.editing-mode{border-color:rgba(255,107,26,0.3)}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .form-group{display:flex;flex-direction:column;gap:0.4rem}
+        .form-group.full{grid-column:1/-1}
+        .form-group label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)}
+        .form-group input,.form-group select,.form-group textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.9rem;color:var(--text);font-size:0.88rem;font-family:inherit;transition:border-color 0.2s;resize:vertical;width:100%}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:rgba(255,107,26,0.4)}
+        .form-group select option{background:var(--surface)}
+        .form-actions{display:flex;gap:0.8rem;justify-content:flex-end;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+        .upload-tabs{display:flex;gap:4px;margin-bottom:0.8rem}
+        .upload-tab{padding:0.4rem 0.9rem;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.15s;font-family:inherit}
+        .upload-tab.active{background:var(--accent-dark);color:var(--accent);border-color:rgba(255,107,26,0.3)}
+        .upload-panel{display:none}.upload-panel.active{display:block}
+        .preview-img{width:100%;max-height:180px;object-fit:cover;border-radius:6px;display:none;margin-top:0.6rem;border:1px solid var(--border)}
+        .tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:0.5rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;min-height:42px;cursor:text}
+        .tag-chip{display:inline-flex;align-items:center;gap:4px;background:var(--accent-dark);border:1px solid rgba(255,107,26,0.2);color:var(--accent);padding:3px 8px;border-radius:999px;font-size:0.75rem}
+        .tag-chip button{background:transparent;border:none;color:inherit;cursor:pointer;font-size:0.9rem;line-height:1;padding:0}
+        .tag-chip-input{border:none;background:transparent;color:var(--text);font-size:0.82rem;outline:none;min-width:80px;font-family:inherit}
+        .items-list{display:flex;flex-direction:column;gap:0.6rem}
+        .item-card{display:flex;align-items:center;gap:1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;transition:border-color 0.15s}
+        .item-card:hover{border-color:rgba(255,255,255,0.12)}
+        .item-card.dragging{opacity:0.5;border-color:var(--accent)}
+        .drag-handle{color:var(--muted);font-size:1rem;cursor:grab;user-select:none;padding:0 4px}
+        .item-thumb{width:48px;height:48px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-size:1.2rem}
+        .item-thumb img{width:100%;height:100%;object-fit:cover}
+        .item-info{flex:1;min-width:0}
+        .item-title{font-size:0.9rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .item-meta{font-size:0.75rem;color:var(--muted);margin-top:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .item-actions{display:flex;gap:0.5rem;flex-shrink:0}
+        .empty{text-align:center;padding:2.5rem;color:var(--muted)}
+        .empty-icon{font-size:2.5rem;margin-bottom:0.8rem;opacity:0.4}
+        .empty p{font-size:0.88rem}
+        .ql-toolbar{background:var(--surface2);border-color:var(--border)!important;border-radius:6px 6px 0 0}
+        .ql-container{background:var(--bg);border-color:var(--border)!important;border-radius:0 0 6px 6px;min-height:220px;font-family:inherit}
+        .ql-editor{color:var(--text);font-size:0.92rem;min-height:200px}
+        .ql-editor.ql-blank::before{color:var(--muted)}
+        .ql-snow .ql-stroke{stroke:var(--muted)}
+        .ql-snow .ql-fill{fill:var(--muted)}
+        .ql-snow .ql-picker{color:var(--muted)}
+        .avatar-upload-area{display:flex;align-items:center;gap:1.2rem}
+        .avatar-preview-circle{width:72px;height:72px;border-radius:50%;background:var(--bg);border:2px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+        .avatar-preview-circle img{width:100%;height:100%;object-fit:cover;display:none}
+        .toast{position:fixed;right:1.5rem;bottom:1.5rem;z-index:9999;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.85rem 1.2rem;border-radius:10px;transform:translateY(100px);opacity:0;transition:all 0.25s;font-size:0.85rem;backdrop-filter:blur(10px)}
+        .toast.show{transform:translateY(0);opacity:1}
+        ::-webkit-scrollbar{width:4px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(255,107,26,0.3);border-radius:999px}
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
+<!-- AUTH GATE -->
 <div id="authGate">
-    <div>
-        <h2>Admin Login</h2>
-        <input id="login-email" placeholder="Email">
-        <input id="login-password" type="password" placeholder="Password">
-        <button onclick="signInAdmin()">Login</button>
-        <p id="authError" style="color:red"></p>
+    <div class="auth-card">
+        <h2>Admin Panel</h2>
+        <p>Sign in to manage your portfolio content</p>
+        <div id="authError" class="auth-error"></div>
+        <div class="auth-field">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="your@email.com"/>
+        </div>
+        <div class="auth-field">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••"
+                onkeydown="if(event.key==='Enter') signInAdmin()"/>
+        </div>
+        <button class="auth-btn" onclick="signInAdmin()">Sign In</button>
     </div>
 </div>
 
 <!-- ADMIN APP -->
-<div id="adminApp" style="display:none">
-<div class="admin">
+<div id="adminApp">
+    <div class="admin-layout">
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <div class="sidebar-item active" onclick="showPage('dashboard', this)">Dashboard</div>
-    <div class="sidebar-item" onclick="showPage('gallery', this)">Gallery</div>
-    <div class="sidebar-item" onclick="showPage('designs', this)">Designs</div>
-    <div class="sidebar-item" onclick="showPage('blog', this)">Blog</div>
-    <div class="sidebar-item" onclick="showPage('about', this)">About</div>
-    <div class="sidebar-item" onclick="showPage('messages', this)">Messages</div>
-    <div class="sidebar-item" onclick="signOutAdmin()">Logout</div>
-</div>
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-text">M<span>M</span></div>
+                <div class="sidebar-logo-sub">Admin Panel</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section">Content</div>
+                <button class="sidebar-item active" onclick="showPage('dashboard',this)">
+                    <i class="fas fa-gauge"></i> Dashboard
+                </button>
+                <button class="sidebar-item" onclick="showPage('gallery',this)">
+                    <i class="fas fa-images"></i> Art Gallery
+                </button>
+                <button class="sidebar-item" onclick="showPage('designs',this)">
+                    <i class="fas fa-pen-nib"></i> Designs
+                </button>
+                <button class="sidebar-item" onclick="showPage('blog',this)">
+                    <i class="fas fa-feather"></i> Blog Posts
+                </button>
+                <div class="sidebar-section">Profile</div>
+                <button class="sidebar-item" onclick="showPage('about',this)">
+                    <i class="fas fa-user"></i> About Me
+                </button>
+                <button class="sidebar-item" onclick="showPage('messages',this)">
+                    <i class="fas fa-envelope"></i> Messages
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="sidebar-item" onclick="window.open('./index.html','_blank')">
+                    <i class="fas fa-arrow-up-right-from-square"></i> View Site
+                </button>
+                <button class="sidebar-item" onclick="signOutAdmin()" style="color:#ff4444">
+                    <i class="fas fa-right-from-bracket"></i> Sign Out
+                </button>
+            </div>
+        </aside>
 
-<!-- CONTENT -->
-<div class="content">
+        <!-- MAIN -->
+        <main class="admin-main">
+            <div class="admin-topbar">
+                <div class="admin-topbar-title">Manoj Mandava — Portfolio Admin</div>
+                <button class="btn btn-ghost" onclick="signOutAdmin()">Sign Out</button>
+            </div>
 
-<!-- DASHBOARD -->
-<div class="page active" id="page-dashboard">
-    <h2>Dashboard</h2>
-    <p>Gallery: <span id="stat-gallery">0</span></p>
-    <p>Designs: <span id="stat-designs">0</span></p>
-    <p>Blog: <span id="stat-blog">0</span></p>
-    <p>Messages: <span id="stat-messages">0</span></p>
-</div>
+            <div class="admin-content">
 
-<!-- GALLERY -->
-<div class="page" id="page-gallery">
-    <h2>Gallery</h2>
+                <!-- DASHBOARD -->
+                <div class="page active" id="page-dashboard">
+                    <div class="welcome-card">
+                        <h3>Welcome back, Manoj! 👋</h3>
+                        <p>Manage your portfolio content from here.</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number" id="stat-gallery">0</div><div class="stat-label">Artworks</div></div>
+                        <div class="stat-card"><div class="stat-number" id="stat-designs">0</div><div class="stat-label">Designs</div></div>
+                        <div class="stat-card"><div class="stat-number" id="stat-blog">0</div><div class="stat-label">Blog Posts</div></div>
+                        <div class="stat-card"><div class="stat-number" id="stat-skills">0</div><div class="stat-label">Skills</div></div>
+                        <div class="stat-card"><div class="stat-number" id="stat-messages">0</div><div class="stat-label">Unread</div></div>
+                    </div>
+                </div>
 
-    <button onclick="toggleForm('galleryForm')">+ Add</button>
+                <!-- GALLERY -->
+                <div class="page" id="page-gallery">
+                    <div class="page-header">
+                        <h2>Art Gallery</h2>
+                        <button class="btn btn-primary" onclick="toggleForm('galleryForm')">+ Add Artwork</button>
+                    </div>
+                    <div class="form-panel" id="galleryForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="g-title" placeholder="Artwork title"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="g-category">
+                                    <option value="digital">Digital Art</option>
+                                    <option value="painting">Painting</option>
+                                    <option value="sketch">Sketch</option>
+                                    <option value="illustration">Illustration</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group full">
+                                <label>Image</label>
+                                <div class="upload-tabs">
+                                    <button class="upload-tab active" onclick="switchUploadTab('g','upload',this)">Upload File</button>
+                                    <button class="upload-tab" onclick="switchUploadTab('g','url',this)">Image URL</button>
+                                </div>
+                                <div class="upload-panel active" id="g-upload-panel">
+                                    <input type="file" id="g-file" accept="image/*" onchange="handleFileUpload('g')"/>
+                                    <img id="g-preview" class="preview-img"/>
+                                </div>
+                                <div class="upload-panel" id="g-url-panel">
+                                    <input type="text" id="g-image-url" placeholder="https://..." oninput="previewUrl('g')"/>
+                                    <img id="g-url-preview" class="preview-img"/>
+                                </div>
+                            </div>
+                            <div class="form-group full">
+                                <label>Description</label>
+                                <textarea id="g-desc" rows="2" placeholder="Brief description..."></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>Tags</label>
+                                <div class="tag-input-wrap" id="g-tags-input" onclick="focusTagInput('g-tag-field')">
+                                    <input class="tag-chip-input" id="g-tag-field" placeholder="Add tag + Enter" onkeydown="addTag(event,'g-tags-input','g-tag-field')"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-ghost" onclick="toggleForm('galleryForm')">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveGallery()">Save Artwork</button>
+                        </div>
+                    </div>
+                    <div class="items-list" id="galleryList">
+                        <div class="empty"><div class="empty-icon">🎨</div><p>No artworks yet.</p></div>
+                    </div>
+                </div>
 
-    <div id="galleryForm" style="display:none">
-        <input id="g-title" placeholder="Title">
-        <textarea id="g-desc" placeholder="Description"></textarea>
-        <button onclick="saveGallery()">Save</button>
+                <!-- DESIGNS -->
+                <div class="page" id="page-designs">
+                    <div class="page-header">
+                        <h2>Graphic Designs</h2>
+                        <button class="btn btn-primary" onclick="toggleForm('designsForm')">+ Add Design</button>
+                    </div>
+                    <div class="form-panel" id="designsForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="d-title" placeholder="Design title"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="d-category">
+                                    <option value="logo">Logo Design</option>
+                                    <option value="branding">Branding</option>
+                                    <option value="poster">Poster</option>
+                                    <option value="social">Social Media</option>
+                                    <option value="ui">UI Design</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group full">
+                                <label>Image</label>
+                                <div class="upload-tabs">
+                                    <button class="upload-tab active" onclick="switchUploadTab('d','upload',this)">Upload File</button>
+                                    <button class="upload-tab" onclick="switchUploadTab('d','url',this)">Image URL</button>
+                                </div>
+                                <div class="upload-panel active" id="d-upload-panel">
+                                    <input type="file" id="d-file" accept="image/*" onchange="handleFileUpload('d')"/>
+                                    <img id="d-preview" class="preview-img"/>
+                                </div>
+                                <div class="upload-panel" id="d-url-panel">
+                                    <input type="text" id="d-image-url" placeholder="https://..." oninput="previewUrl('d')"/>
+                                    <img id="d-url-preview" class="preview-img"/>
+                                </div>
+                            </div>
+                            <div class="form-group full">
+                                <label>Description</label>
+                                <textarea id="d-desc" rows="2" placeholder="Brief description..."></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>Tags</label>
+                                <div class="tag-input-wrap" id="d-tags-input" onclick="focusTagInput('d-tag-field')">
+                                    <input class="tag-chip-input" id="d-tag-field" placeholder="Add tag + Enter" onkeydown="addTag(event,'d-tags-input','d-tag-field')"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-ghost" onclick="toggleForm('designsForm')">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveDesign()">Save Design</button>
+                        </div>
+                    </div>
+                    <div class="items-list" id="designsList">
+                        <div class="empty"><div class="empty-icon">🖌️</div><p>No designs yet.</p></div>
+                    </div>
+                </div>
+
+                <!-- BLOG -->
+                <div class="page" id="page-blog">
+                    <div class="page-header">
+                        <h2>Blog Posts</h2>
+                        <button class="btn btn-primary" onclick="toggleForm('blogForm')">+ Write Post</button>
+                    </div>
+                    <div class="form-panel" id="blogForm">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label>Title</label>
+                                <input type="text" id="b-title" placeholder="Post title..."/>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="b-category">
+                                    <option value="thoughts">Thoughts</option>
+                                    <option value="story">Story</option>
+                                    <option value="tech">Tech</option>
+                                    <option value="art">Art</option>
+                                    <option value="life">Life</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="b-date"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Platform</label>
+                                <select id="b-platform">
+                                    <option value="">Internal Only</option>
+                                    <option value="Substack">Substack</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Blogspot">Blogspot</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>External URL</label>
+                                <input type="text" id="b-url" placeholder="https://..."/>
+                            </div>
+                            <div class="form-group full">
+                                <label>Excerpt</label>
+                                <textarea id="b-excerpt" rows="2" placeholder="Short summary..."></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>Content</label>
+                                <div id="b-editor"></div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-ghost" onclick="toggleForm('blogForm')">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveBlog()">Publish Post</button>
+                        </div>
+                    </div>
+                    <div class="items-list" id="blogList">
+                        <div class="empty"><div class="empty-icon">✍️</div><p>No posts yet.</p></div>
+                    </div>
+                </div>
+
+                <!-- ABOUT ME -->
+                <div class="page" id="page-about">
+                    <div class="page-header">
+                        <h2>About Me</h2>
+                        <button class="btn btn-primary" onclick="saveAbout()">Save Changes</button>
+                    </div>
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.4rem">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label>Avatar</label>
+                                <div class="avatar-upload-area">
+                                    <div class="avatar-preview-circle">
+                                        <img id="av-preview" src="" alt=""/>
+                                    </div>
+                                    <div style="flex:1">
+                                        <div class="upload-tabs">
+                                            <button class="upload-tab active" onclick="switchUploadTab('av','upload',this)">Upload</button>
+                                            <button class="upload-tab" onclick="switchUploadTab('av','url',this)">URL</button>
+                                        </div>
+                                        <div class="upload-panel active" id="av-upload-panel">
+                                            <input type="file" id="av-file" accept="image/*" onchange="handleFileUpload('av')"/>
+                                        </div>
+                                        <div class="upload-panel" id="av-url-panel">
+                                            <input type="text" id="av-image-url" placeholder="https://..." oninput="previewUrl('av')"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="a-name" placeholder="Manoj Mandava"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Title / Role</label>
+                                <input type="text" id="a-title" placeholder="Artist · Developer · Writer"/>
+                            </div>
+                            <div class="form-group full">
+                                <label>Tagline</label>
+                                <input type="text" id="a-tagline" placeholder="Short tagline..."/>
+                            </div>
+                            <div class="form-group full">
+                                <label>Bio Paragraph 1</label>
+                                <textarea id="a-bio1" rows="3" placeholder="First bio paragraph..."></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>Bio Paragraph 2</label>
+                                <textarea id="a-bio2" rows="3" placeholder="Second bio paragraph..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="a-email" placeholder="your@email.com"/>
+                            </div>
+                            <div class="form-group full">
+                                <label>Skills</label>
+                                <div class="tag-input-wrap" id="a-skills-input" onclick="focusTagInput('a-skill-field')">
+                                    <input class="tag-chip-input" id="a-skill-field" placeholder="Add skill + Enter" onkeydown="addTag(event,'a-skills-input','a-skill-field')"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MESSAGES -->
+                <div class="page" id="page-messages">
+                    <div class="page-header">
+                        <h2>Messages</h2>
+                        <button class="btn btn-ghost" onclick="loadMessages()">↺ Refresh</button>
+                    </div>
+                    <div class="items-list" id="messagesList">
+                        <div class="empty"><div class="empty-icon">📬</div><p>No messages yet.</p></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
-
-    <div id="galleryList"></div>
 </div>
 
-<!-- DESIGNS -->
-<div class="page" id="page-designs">
-    <h2>Designs</h2>
+<div id="toast" class="toast"></div>
 
-    <button onclick="toggleForm('designsForm')">+ Add</button>
-
-    <div id="designsForm" style="display:none">
-        <input id="d-title" placeholder="Title">
-        <textarea id="d-desc"></textarea>
-        <button onclick="saveDesign()">Save</button>
-    </div>
-
-    <div id="designsList"></div>
-</div>
-
-<!-- BLOG -->
-<div class="page" id="page-blog">
-    <h2>Blog</h2>
-
-    <button onclick="toggleForm('blogForm')">+ Add</button>
-
-    <div id="blogForm" style="display:none">
-        <input id="b-title" placeholder="Title">
-        <textarea id="b-excerpt" placeholder="Excerpt"></textarea>
-        <div id="b-editor" style="height:200px;background:#fff"></div>
-        <button onclick="saveBlog()">Save</button>
-    </div>
-
-    <div id="blogList"></div>
-</div>
-
-<!-- ABOUT -->
-<div class="page" id="page-about">
-    <h2>About Me</h2>
-
-    <input id="a-name" placeholder="Name">
-    <input id="a-title" placeholder="Title">
-    <input id="a-tagline" placeholder="Tagline">
-    <textarea id="a-bio1"></textarea>
-    <textarea id="a-bio2"></textarea>
-    <input id="a-email" placeholder="Email">
-
-    <button onclick="saveAbout()">Save</button>
-</div>
-
-<!-- MESSAGES -->
-<div class="page" id="page-messages">
-    <h2>Messages</h2>
-    <div id="messagesList"></div>
-</div>
-
-</div>
-</div>
-</div>
-
-<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/supabase-config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+<script src="./js/supabase-config.js"></script>
 <script src="./js/admin.js"></script>
-
 </body>
 </html>

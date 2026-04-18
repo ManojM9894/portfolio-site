@@ -267,30 +267,59 @@ section {
     text-align: center;
     overflow: hidden;
     position: relative;
-    background-image: url('../assets/infinity.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: #000;
 }
 
+/* Your actual uploaded PNG */
 #home::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.48);
+    background-image: url('../assets/infinity-bg.png');
+    background-repeat: no-repeat;
+    background-position: center 42%;
+    background-size: min(78vw, 980px);
+    opacity: 0.22; /* faded */
+    filter: blur(0.5px) saturate(0.95) brightness(0.9);
     z-index: 0;
+    pointer-events: none;
 }
 
+
+/* extra dark fade so text stays readable */
 #home::after {
-    content: '';
+    content: "";
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 200px;
-    background: linear-gradient(to bottom, transparent, #000);
-    z-index: 0;
+    inset: 0;
+    background:
+        radial-gradient(circle at center, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.94) 100%),
+        linear-gradient(to bottom, rgba(0,0,0,0.82), rgba(0,0,0,0.3) 35%, rgba(0,0,0,0.88));
+    z-index: 1;
+    pointer-events: none;
+}
+/* SF / Apple-like stack */
+body,
+button,
+input,
+textarea,
+select,
+.nav-logo,
+.nav-links a,
+.hero-greeting,
+.hero-name,
+.hero-title,
+.hero-tagline,
+.section-title,
+.section-subtitle {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "Helvetica Neue",
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 
 .hero-content {
@@ -300,16 +329,12 @@ section {
     margin: 0 auto;
     padding: 100px 20px 60px;
 }
-
 .hero-greeting {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.42);
     text-transform: uppercase;
-    letter-spacing: 0.45em;
+    letter-spacing: 0.38em;
     font-size: 0.78rem;
-    margin-bottom: 1.2rem;
-    opacity: 0;
-    animation: fadeInUp 0.8s ease forwards 0.2s;
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
+    margin-bottom: 1rem;
     font-weight: 400;
     display: flex;
     align-items: center;
@@ -319,15 +344,16 @@ section {
 
 .hero-greeting::before,
 .hero-greeting::after {
-    content: '';
+    content: "";
     display: block;
     width: 28px;
     height: 1px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255,255,255,0.18);
 }
 
+/* slightly smaller than before */
 .hero-name {
-    font-size: clamp(4rem, 10vw, 8rem);
+    font-size: clamp(3rem, 7vw, 5.5rem);
     line-height: 0.88;
     font-weight: 700;
     margin: 0 0 1.2rem;
@@ -336,40 +362,35 @@ section {
     letter-spacing: -0.045em;
     font-family: -apple-system, 'SF Pro Display', sans-serif;
 }
-
 #hero-first-name {
-    color: #ffffff;
     display: block;
-    text-shadow: 0 0 60px rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    text-shadow: 0 0 34px rgba(255,255,255,0.08);
 }
 
 #hero-last-name {
-    color: #ff6b1a;
     display: block;
-    text-shadow: 0 0 80px rgba(255, 107, 26, 0.4);
+    color: #ff6b1a;
+    text-shadow:
+        0 0 20px rgba(255,107,26,0.2),
+        0 0 50px rgba(255,107,26,0.12);
 }
 
 .hero-title {
-    color: rgba(255, 255, 255, 0.35);
-    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+    color: rgba(255,255,255,0.3);
+    font-size: clamp(0.82rem, 1.8vw, 0.96rem);
     margin-bottom: 0.8rem;
-    opacity: 0;
-    animation: fadeInUp 0.8s ease forwards 0.5s;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
     font-weight: 400;
 }
 
 .hero-tagline {
-    max-width: 560px;
+    max-width: 620px;
     margin: 0 auto 2rem;
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255,255,255,0.34);
     font-size: 1rem;
-    line-height: 1.7;
-    opacity: 0;
-    animation: fadeInUp 0.8s ease forwards 0.65s;
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
+    line-height: 1.75;
     font-weight: 300;
 }
 
@@ -604,59 +625,62 @@ section {
 #githubCards {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
 }
 
 .github-card {
-    background: rgba(10,10,10,0.8);
-    border: 1px solid var(--border);
+    background: rgba(10,10,10,0.82);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1.2rem;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
 }
 
 .github-card:hover {
-    border-color: rgba(255,255,255,0.15);
     transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.16);
 }
 
 .github-card-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
 }
 
 .github-card-name {
-    color: var(--text-primary);
+    color: #fff;
     text-decoration: none;
     font-weight: 600;
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
 }
 
-.github-card-name:hover { color: var(--accent); }
+.github-card-name:hover {
+    color: var(--accent);
+}
 
 .github-card-desc {
-    color: var(--text-secondary);
+    color: rgba(255,255,255,0.45);
     font-size: 0.88rem;
-    margin-bottom: 1rem;
     line-height: 1.6;
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
+    margin-bottom: 1rem;
 }
 
 .github-stats {
     display: flex;
-    gap: 1rem;
     flex-wrap: wrap;
+    gap: 0.8rem;
     font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-family: -apple-system, 'SF Pro Text', sans-serif;
+    color: rgba(255,255,255,0.5);
 }
 
-.github-stat { display: flex; align-items: center; gap: 0.3rem; }
+.github-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
 
 .github-lang-dot {
     width: 8px;
@@ -665,7 +689,6 @@ section {
     background: var(--accent);
     display: inline-block;
 }
-
 /* ==========================================
    ABOUT
 ========================================== */
@@ -761,6 +784,16 @@ section {
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(20px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.premium-contact-card:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+                0 0 30px rgba(255, 255, 255, 0.06),
+                0 0 80px rgba(255, 255, 255, 0.03),
+                0 8px 32px rgba(0, 0, 0, 0.5);
+    transform: translateY(-3px);
 }
 
 .contact-card-top {
@@ -813,7 +846,7 @@ section {
     border-radius: 8px;
     font-weight: 600;
     font-size: 0.82rem;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     width: 100%;
     justify-content: center;
     letter-spacing: 0.04em;
@@ -823,7 +856,9 @@ section {
 .premium-email-btn:hover {
     background: #ff5500;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255,107,26,0.3);
+    box-shadow: 0 0 20px rgba(255, 107, 26, 0.5),
+                0 0 60px rgba(255, 107, 26, 0.2),
+                0 8px 24px rgba(255, 107, 26, 0.3);
 }
 
 .premium-social-icons {
@@ -845,22 +880,29 @@ section {
     color: var(--text-secondary);
     font-size: 0.8rem;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     font-family: -apple-system, 'SF Pro Text', sans-serif;
 }
 
 .social-link i { font-size: 0.9rem; width: 16px; text-align: center; }
 
-.social-link:hover              { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); color: #fff; }
-.social-link.linkedin:hover     { border-color: #0077b5; color: #0077b5; }
-.social-link.github:hover       { border-color: #fff; color: #fff; }
-.social-link.substack:hover     { border-color: #FF6719; color: #FF6719; }
-.social-link.medium:hover       { border-color: #fff; color: #fff; }
-.social-link.blogger:hover      { border-color: #FF5722; color: #FF5722; }
-.social-link.tableau:hover      { border-color: #E97627; color: #E97627; }
-.social-link.facebook:hover     { border-color: #1877F2; color: #1877F2; }
-.social-link.instagram:hover    { border-color: #E1306C; color: #E1306C; }
-.social-link.disabled           { opacity: 0.25; cursor: default; pointer-events: none; }
+.social-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(255,255,255,0.06),
+                0 4px 12px rgba(0,0,0,0.3);
+}
+
+.social-link.linkedin:hover  { border-color: #0077b5; color: #0077b5; box-shadow: 0 0 16px rgba(0,119,181,0.2); }
+.social-link.github:hover    { border-color: #fff;    color: #fff;    box-shadow: 0 0 16px rgba(255,255,255,0.1); }
+.social-link.substack:hover  { border-color: #FF6719; color: #FF6719; box-shadow: 0 0 16px rgba(255,103,25,0.2); }
+.social-link.medium:hover    { border-color: #fff;    color: #fff;    box-shadow: 0 0 16px rgba(255,255,255,0.1); }
+.social-link.blogger:hover   { border-color: #FF5722; color: #FF5722; box-shadow: 0 0 16px rgba(255,87,34,0.2); }
+.social-link.tableau:hover   { border-color: #E97627; color: #E97627; box-shadow: 0 0 16px rgba(233,118,39,0.2); }
+.social-link.facebook:hover  { border-color: #1877F2; color: #1877F2; box-shadow: 0 0 16px rgba(24,119,242,0.2); }
+.social-link.instagram:hover { border-color: #E1306C; color: #E1306C; box-shadow: 0 0 16px rgba(225,48,108,0.2); }
+.social-link.disabled        { opacity: 0.25; cursor: default; pointer-events: none; }
 
 .contact-form-grid {
     display: grid;
@@ -912,7 +954,7 @@ section {
     border-radius: 8px;
     width: 100%;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -923,7 +965,9 @@ section {
 #contactForm button[type="submit"]:hover {
     background: #ff5500;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255,107,26,0.3);
+    box-shadow: 0 0 20px rgba(255, 107, 26, 0.5),
+                0 0 60px rgba(255, 107, 26, 0.2),
+                0 8px 24px rgba(255, 107, 26, 0.3);
 }
 
 /* ==========================================
@@ -1069,6 +1113,7 @@ section {
 .collection-grid-card:hover {
     border-color: rgba(255,255,255,0.15);
     transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255,255,255,0.04);
 }
 
 .collection-grid-card img {
@@ -1109,7 +1154,6 @@ section {
 }
 
 .toast.show { transform: translateY(0); opacity: 1; }
-
 /* ==========================================
    BLOG READER MODAL
 ========================================== */
@@ -1207,4 +1251,35 @@ section {
     .contact-form-grid    { grid-template-columns: 1fr; }
 
     .hero-name { font-size: clamp(3rem, 14vw, 5rem); }
+}
+.recent-works-reel {
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.reel-track {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    cursor: grab;
+    user-select: none;
+}
+
+.reel-card {
+    min-width: 260px;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.reel-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.reel-card:hover {
+    transform: scale(1.1);
 }

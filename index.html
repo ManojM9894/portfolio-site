@@ -1,266 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manoj Mandava | Portfolio</title>
-  <meta name="description" content="Portfolio of Manoj Mandava — artist, designer, developer, and writer." />
-  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manoj Mandava | Portfolio</title>
+    <meta name="description" content="Portfolio of Manoj Mandava — artist, designer, developer, and writer." />
+    <link rel="icon" href="./assets/favicon.png" type="image/png">
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <nav>
-    <a href="#home" class="nav-logo">MM</a>
+     <!-- FULL PAGE INFINITY WATERMARK -->
+<div style="
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background-image: url('./assets/infinity-bg.png');
+    background-size: 140%;
+    background-position: center center;
+    background-repeat: repeat;
+    opacity: 0.46;
+    mix-blend-mode: screen;
+"></div>
+    <!-- NAVBAR -->
+    <nav>
+        <a href="#home" class="nav-logo">MM</a>
+        <ul class="nav-links">
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#gallery">Art Gallery</a></li>
+            <li><a href="#designs">Designs</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#github">GitHub</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="admin-menu">
+                <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="Admin">⋯</button>
+                <div class="admin-dropdown" id="adminDropdown">
+                    <button type="button" class="admin-dropdown-link" id="openAdminBtn">Admin Panel</button>
+                </div>
+            </li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </nav>
 
-    <ul class="nav-links">
-      <li><a href="#home" class="active">Home</a></li>
-      <li><a href="#gallery">Art Gallery</a></li>
-      <li><a href="#designs">Designs</a></li>
-      <li><a href="#blog">Blog</a></li>
-      <li><a href="#github">GitHub</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-
-      <li class="admin-menu">
-        <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="Admin controls">⋯</button>
-        <div class="admin-dropdown" id="adminDropdown">
-          <a href="./admin.html" class="admin-dropdown-link">Admin Panel</a>
-        </div>
-      </li>
-    </ul>
-
-    <div class="hamburger">
-      <span></span><span></span><span></span>
-    </div>
-  </nav>
-
-  <section id="home">
+    <!-- HERO -->
+   <section id="home">
     <div class="hero-content">
-      <div class="hero-greeting">WELCOME TO MY PORTFOLIO</div>
+        <div style="position:relative;z-index:1;">
+            <div class="hero-greeting">Welcome to my Portfolio</div>
+            <h1 class="hero-name">
+                <span id="hero-first-name">Manoj</span>
+                <span id="hero-last-name">Mandava</span>
+            </h1>
+            <p class="hero-title" id="hero-title">Working Professional · Artist · Writer · Designer · Developer</p>
+            <p class="hero-tagline" id="hero-tagline">Just for fun!!</p>
+            <div class="hero-btns">
+                <a href="#gallery" class="btn-primary">View My Work</a>
+                <a href="#contact" class="btn-ghost">Contact Me</a>
+            </div>
+            <div class="recent-works-section">
+                <div class="section-header-row">
+                    <div>
+                        <h2 class="section-title">Recent <span>Works</span></h2>
+                        <p class="section-subtitle">Latest art, designs, and writing</p>
+                    </div>
+                </div>
+                <div id="recentWorksGrid"></div>
+            </div>
+            <div class="hero-scroll">SCROLL</div>
+        </div>
+    </div>
+</section>
 
-      <h1 class="hero-name" id="hero-name">
-        <span id="hero-first-name">Manoj</span>
-        <span id="hero-last-name">Mandava</span>
-      </h1>
-
-      <p class="hero-title" id="hero-title">
-        Working Professional · Artist · Designer · Developer
-      </p>
-
-      <p class="hero-tagline" id="hero-tagline">
-        Turning imagination into reality — one canvas, word, and line of code at a time.
-      </p>
-
-      <div class="hero-btns">
-        <a href="#gallery" class="btn-primary">View My Work</a>
-        <a href="#contact" class="btn-ghost">Contact Me</a>
-      </div>
-
-      <div class="recent-works-section" id="recent-works-section">
+    <!-- ART GALLERY -->
+    <section id="gallery">
         <div class="section-header-row">
-          <div>
-            <h2 class="section-title">Recent <span>Works</span></h2>
-            <p class="section-subtitle">Latest art, designs, and writing</p>
-          </div>
+            <div>
+                <h2 class="section-title">Art <span>Gallery</span></h2>
+                <p class="section-subtitle">Original artwork and illustrations</p>
+                <div class="section-divider"></div>
+            </div>
+            <button class="section-view-all" onclick="openCollectionModal('gallery')">View All ↗</button>
         </div>
-        <div id="recentWorksGrid"></div>
-      </div>
+        <div id="galleryGrid"></div>
+    </section>
 
-      <div class="hero-scroll">SCROLL</div>
-    </div>
-  </section>
-
-  <section id="gallery">
-    <div class="section-header-row">
-      <div>
-        <h2 class="section-title">Art <span>Gallery</span></h2>
-        <p class="section-subtitle">Original artwork and illustrations</p>
-        <div class="section-divider"></div>
-      </div>
-      <button class="section-view-all" onclick="openCollectionModal('gallery')">View All ↗</button>
-    </div>
-    <div id="galleryGrid"></div>
-  </section>
-
-  <section id="designs">
-    <div class="section-header-row">
-      <div>
-        <h2 class="section-title">Graphic <span>Designs</span></h2>
-        <p class="section-subtitle">Creative designs and visual projects</p>
-        <div class="section-divider"></div>
-      </div>
-      <button class="section-view-all" onclick="openCollectionModal('designs')">View All ↗</button>
-    </div>
-    <div id="designsGrid"></div>
-  </section>
-
-  <section id="blog">
-    <div class="section-header-row">
-      <div>
-        <h2 class="section-title">Writing <span>Blog</span></h2>
-        <p class="section-subtitle">Thoughts, stories, and articles</p>
-        <div class="section-divider"></div>
-      </div>
-      <button class="section-view-all" onclick="openCollectionModal('blog')">View All ↗</button>
-    </div>
-    <div id="blogList"></div>
-  </section>
-
-  <div id="blogReaderModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);overflow-y:auto;padding:2rem 1rem;">
-    <div style="max-width:780px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;position:relative;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;">
-        <div style="display:flex;align-items:center;gap:0.8rem">
-          <span style="color:var(--accent);font-size:1.2rem">✍️</span>
-          <span id="readerModalMeta" style="font-size:0.85rem;color:var(--text-secondary)"></span>
+    <!-- DESIGNS -->
+    <section id="designs">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">Graphic <span>Designs</span></h2>
+                <p class="section-subtitle">Creative designs and visual projects</p>
+                <div class="section-divider"></div>
+            </div>
+            <button class="section-view-all" onclick="openCollectionModal('designs')">View All ↗</button>
         </div>
-        <button onclick="closeBlogReader()" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
-      </div>
+        <div id="designsGrid"></div>
+    </section>
 
-      <div style="padding:2rem 1.5rem;">
-        <h1 id="readerModalTitle" style="font-size:1.8rem;font-weight:800;margin-bottom:1.5rem;color:var(--text-primary);line-height:1.2"></h1>
-        <div id="readerModalContent" style="color:var(--text-secondary);line-height:1.8;font-size:1rem;"></div>
-        <div id="readerModalExternal" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)"></div>
-      </div>
-    </div>
-  </div>
-
-  <section id="github">
-    <div class="section-header-row">
-      <div>
-        <h2 class="section-title">GitHub <span>Projects</span></h2>
-        <p class="section-subtitle">Code repositories and development work</p>
-        <div class="section-divider"></div>
-      </div>
-    </div>
-    <div id="githubCards"></div>
-  </section>
-
-  <section id="about">
-    <div class="section-header-row">
-      <div>
-        <h2 class="section-title">About <span>Me</span></h2>
-        <p class="section-subtitle">A bit about who I am and what I do</p>
-        <div class="section-divider"></div>
-      </div>
-    </div>
-
-    <div class="about-grid">
-      <div class="about-image-card">
-        <div id="about-avatar" class="about-avatar">👤</div>
-      </div>
-
-      <div class="about-content">
-        <h3 id="about-name">Manoj Mandava</h3>
-        <p id="about-bio1"></p>
-        <p id="about-bio2"></p>
-
-        <div class="skills-wrapper">
-          <h4>Skills</h4>
-          <div id="about-skills" class="skills-list"></div>
+    <!-- BLOG -->
+    <section id="blog">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">Writing <span>Blog</span></h2>
+                <p class="section-subtitle">Thoughts, stories, and articles</p>
+                <div class="section-divider"></div>
+            </div>
+            <button class="section-view-all" onclick="openCollectionModal('blog')">View All ↗</button>
         </div>
-      </div>
-    </div>
-  </section>
+        <div id="blogList"></div>
+    </section>
 
-  <section id="contact">
-    <div class="contact-grid premium-contact-grid">
-      <div class="contact-card premium-contact-card">
-        <div class="contact-card-top">
-          <div class="contact-icon-badge">
-            <i class="fas fa-share-nodes"></i>
-          </div>
-          <div>
-            <h3>Connect</h3>
-            <p>Connect through my social, writing, portfolio, and analytics platforms.</p>
-          </div>
+    <!-- GITHUB -->
+    <section id="github">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">GitHub <span>Projects</span></h2>
+                <p class="section-subtitle">Code repositories and development work</p>
+                <div class="section-divider"></div>
+            </div>
         </div>
+        <div id="githubCards"></div>
+    </section>
 
-        <div class="social-icons premium-social-icons">
-          <a href="https://www.linkedin.com/in/manojkmandava/" target="_blank" rel="noopener noreferrer" class="social-link linkedin"><i class="fab fa-linkedin-in"></i><span>LinkedIn</span></a>
-          <a href="https://github.com/ManojM9894" target="_blank" rel="noopener noreferrer" class="social-link github"><i class="fab fa-github"></i><span>GitHub</span></a>
-          <a href="https://substack.com/@manojmandava" target="_blank" rel="noopener noreferrer" class="social-link substack"><i class="fas fa-newspaper"></i><span>Substack</span></a>
-          <a href="https://medium.com/@manoj.mandava9" target="_blank" rel="noopener noreferrer" class="social-link medium"><i class="fab fa-medium-m"></i><span>Medium</span></a>
-          <a href="https://manojmandava.blogspot.com/" target="_blank" rel="noopener noreferrer" class="social-link blogger"><i class="fab fa-blogger-b"></i><span>Blog</span></a>
-          <a href="https://public.tableau.com/app/profile/manoj.kumar.mandava/vizzes" target="_blank" rel="noopener noreferrer" class="social-link tableau"><i class="fas fa-chart-column"></i><span>Tableau</span></a>
-          <a href="https://www.facebook.com/manoj.mandava" target="_blank" rel="noopener noreferrer" class="social-link facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
-          <a href="#" class="social-link instagram disabled"><i class="fab fa-instagram"></i><span>Instagram</span></a>
+    <!-- ABOUT -->
+    <section id="about">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">About <span>Me</span></h2>
+                <p class="section-subtitle">A bit about who I am and what I do</p>
+                <div class="section-divider"></div>
+            </div>
         </div>
-
-        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-          <a href="mailto:manojmandava@proton.me" class="premium-email-btn" style="width:100%;justify-content:center">
-            <i class="fas fa-envelope"></i>
-            <span>manojmandava@proton.me</span>
-          </a>
+        <div class="about-grid">
+            <div class="about-image-card">
+                <div id="about-avatar" class="about-avatar">👤</div>
+            </div>
+            <div class="about-content">
+                <h3 id="about-name">Manoj Mandava</h3>
+                <p id="about-bio1"></p>
+                <p id="about-bio2"></p>
+                <div class="skills-wrapper">
+                    <h4>Skills</h4>
+                    <div id="about-skills" class="skills-list"></div>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
 
-      <div class="contact-card premium-contact-card">
-        <div class="contact-card-top">
-          <div class="contact-icon-badge">
-            <i class="fas fa-paper-plane"></i>
-          </div>
-          <div>
-            <h3>Send a Message</h3>
-            <p>Fill in the form below and I'll get back to you as soon as possible.</p>
-          </div>
+    <!-- CONTACT -->
+    <section id="contact">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">Get In <span>Touch</span></h2>
+                <p class="section-subtitle">Let's connect and create something together</p>
+                <div class="section-divider"></div>
+            </div>
         </div>
+        <div class="premium-contact-grid">
+            <div class="premium-contact-card">
+                <div class="contact-card-top">
+                    <div class="contact-icon-badge"><i class="fas fa-share-nodes"></i></div>
+                    <div>
+                        <h3>Connect</h3>
+                        <p>Find me across social, writing, and analytics platforms.</p>
+                    </div>
+                </div>
+                <div class="premium-social-icons">
+                    <a href="https://www.linkedin.com/in/manojkmandava/" target="_blank" class="social-link linkedin"><i class="fab fa-linkedin-in"></i><span>LinkedIn</span></a>
+                    <a href="https://github.com/ManojM9894" target="_blank" class="social-link github"><i class="fab fa-github"></i><span>GitHub</span></a>
+                    <a href="https://substack.com/@manojmandava" target="_blank" class="social-link substack"><i class="fas fa-newspaper"></i><span>Substack</span></a>
+                    <a href="https://medium.com/@manoj.mandava9" target="_blank" class="social-link medium"><i class="fab fa-medium-m"></i><span>Medium</span></a>
+                    <a href="https://manojmandava.blogspot.com/" target="_blank" class="social-link blogger"><i class="fab fa-blogger-b"></i><span>Blog</span></a>
+                    <a href="https://public.tableau.com/app/profile/manoj.kumar.mandava/vizzes" target="_blank" class="social-link tableau"><i class="fas fa-chart-column"></i><span>Tableau</span></a>
+                    <a href="https://www.facebook.com/manoj.mandava" target="_blank" class="social-link facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
+                    <a href="#" class="social-link instagram disabled"><i class="fab fa-instagram"></i><span>Instagram</span></a>
+                </div>
+                <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+                    <a href="https://mail.google.com/mail/?view=cm&to=manojmandava@proton.me" target="_blank" class="premium-email-btn">
+                        <i class="fas fa-envelope"></i><span>manojmandava@proton.me</span>
+                    </a>
+                </div>
+            </div>
+            <div class="premium-contact-card">
+                <div class="contact-card-top">
+                    <div class="contact-icon-badge"><i class="fas fa-paper-plane"></i></div>
+                    <div>
+                        <h3>Send a Message</h3>
+                        <p>Fill in the form and I'll get back to you as soon as possible.</p>
+                    </div>
+                </div>
+                <form id="contactForm" class="contact-form-grid">
+                    <div class="contact-form-group">
+                        <label>Your Name</label>
+                        <input type="text" placeholder="John Doe" required />
+                    </div>
+                    <div class="contact-form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="john@example.com" required />
+                    </div>
+                    <div class="contact-form-group full">
+                        <label>Subject</label>
+                        <input type="text" placeholder="What is this about?" />
+                    </div>
+                    <div class="contact-form-group full">
+                        <label>Message</label>
+                        <textarea rows="5" placeholder="Your message here..." required></textarea>
+                    </div>
+                    <div class="contact-form-group full">
+                        <button type="submit"><i class="fas fa-paper-plane"></i> Send Message 🚀</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 
-        <form id="contactForm" class="contact-form-grid">
-          <div class="contact-form-group">
-            <label>Your Name</label>
-            <input type="text" id="contact-name" placeholder="John Doe" required />
-          </div>
-
-          <div class="contact-form-group">
-            <label>Email Address</label>
-            <input type="email" id="contact-email" placeholder="john@example.com" required />
-          </div>
-
-          <div class="contact-form-group full">
-            <label>Subject</label>
-            <input type="text" id="contact-subject" placeholder="What is this about?" />
-          </div>
-
-          <div class="contact-form-group full">
-            <label>Message</label>
-            <textarea id="contact-message" rows="5" placeholder="Your message here..." required></textarea>
-          </div>
-
-          <div class="contact-form-group full">
-            <button type="submit" class="btn-primary premium-email-btn" style="width:100%;justify-content:center;border:none;">
-              <i class="fas fa-paper-plane"></i>
-              Send Message
-            </button>
-          </div>
-        </form>
-      </div>
+    <!-- BLOG READER MODAL -->
+    <div id="blogReaderModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);overflow-y:auto;padding:2rem 1rem;">
+        <div style="max-width:780px;margin:0 auto;background:#0d0d0d;border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#0d0d0d;z-index:1;">
+                <div style="display:flex;align-items:center;gap:0.8rem">
+                    <span style="color:var(--accent)">✍️</span>
+                    <span id="readerModalMeta" style="font-size:0.78rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em"></span>
+                </div>
+                <button onclick="closeBlogReader()"
+                    style="background:transparent;border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center"
+                    onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='#fff'"
+                    onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.4)'">✕</button>
+            </div>
+            <div style="padding:2rem 1.5rem">
+                <h1 id="readerModalTitle" style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem;color:#fff;line-height:1.2;letter-spacing:-0.03em"></h1>
+                <div id="readerModalContent" style="color:rgba(255,255,255,0.6);line-height:1.8;font-size:0.95rem"></div>
+                <div id="readerModalExternal" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.07)"></div>
+            </div>
+        </div>
     </div>
-  </section>
 
-  <div class="collection-modal" id="collectionModal">
-    <div class="collection-modal-backdrop" onclick="closeCollectionModal()"></div>
-    <div class="collection-modal-panel">
-      <div class="collection-modal-header">
-        <h3 id="collectionModalTitle">All Items</h3>
-        <button class="collection-close" onclick="closeCollectionModal()">✕</button>
-      </div>
-      <div id="collectionModalContent" class="collection-modal-content"></div>
+    <!-- COLLECTION MODAL -->
+    <div class="collection-modal" id="collectionModal">
+        <div class="collection-modal-backdrop" onclick="closeCollectionModal()"></div>
+        <div class="collection-modal-panel">
+            <div class="collection-modal-header">
+                <h3 id="collectionModalTitle">All Items</h3>
+                <button class="collection-close" onclick="closeCollectionModal()">✕</button>
+            </div>
+            <div id="collectionModalContent" class="collection-modal-content"></div>
+        </div>
     </div>
-  </div>
 
-  <div class="lightbox" id="lightbox">
-    <div class="lightbox-content">
-      <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-      <img id="lightboxImg" src="" alt="Preview" />
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+            <img id="lightboxImg" src="" alt="Preview" />
+        </div>
     </div>
-  </div>
 
-  <div id="toast" class="toast"></div>
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./js/supabase-config.js"></script>
-  <script src="./js/github.js"></script>
-  <script src="./js/app.js"></script>
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./js/supabase-config.js"></script>
+    <script src="./js/github.js"></script>
+    <script src="./js/app.js"></script>
 </body>
 </html>

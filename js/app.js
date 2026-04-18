@@ -249,25 +249,21 @@ async function renderDesigns() {
 async function renderBlog() {
     const list = document.getElementById('blogList');
     if (!list) return;
-
     try {
         const items = await fetchBlogs();
         blogCache = items;
-
         if (!items.length) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">✍️</div>
-                    <p>Your articles and writings will appear here.<br>Add posts via the Admin panel!</p>
-                </div>`;
+            list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✍️</div><p>Articles coming soon!</p></div>`;
             return;
         }
 
+        const loop = items.length < 4 ? [...items, ...items, ...items] : [...items, ...items];
+
         list.innerHTML = `
             <div class="carousel-shell">
-                <div class="carousel-wrap center-carousel">
+                <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
                     <div class="carousel-track">
-                        ${items.map(item => `
+                        ${loop.map(item => `
                             <div class="blog-carousel-card">
                                 <div class="blog-scroll-meta">
                                     ${platformIcons[item.platform] || '✍️'}
@@ -279,29 +275,23 @@ async function renderBlog() {
                                 <div class="blog-scroll-excerpt">${escapeHtml(item.excerpt || '')}</div>
                                 <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap">
                                     ${item.content
-                ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
-                : ''}
+                                        ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
+                                        : ''}
                                     ${item.url
-                ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
-                : ''}
+                                        ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
+                                        : ''}
                                 </div>
-                            </div>
-                        `).join('')}
+                            </div>`).join('')}
                     </div>
                 </div>
             </div>`;
 
         initCenterCarousels();
-    } catch (error) {
-        console.error('Failed to load blog:', error);
-        list.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">⚠️</div>
-                <p>Failed to load blog posts.</p>
-            </div>`;
+    } catch(e) {
+        console.error('Blog error:', e);
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to load blog.</p></div>`;
     }
 }
-
 // ==========================================
 // RECENT WORKS
 // ==========================================

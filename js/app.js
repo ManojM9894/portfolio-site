@@ -347,114 +347,94 @@ function renderRecentWorks() {
     initCenterCarousels();
 }
 
-// ==========================================
-// COLLECTION MODAL
-// ==========================================
 function openCollectionModal(type) {
-    const modal = document.getElementById('collectionModal');
-    const title = document.getElementById('collectionModalTitle');
+    const modal   = document.getElementById('collectionModal');
+    const title   = document.getElementById('collectionModalTitle');
     const content = document.getElementById('collectionModalContent');
-
     if (!modal || !title || !content) return;
 
-    content.className = 'collection-modal-content';
-    content.scrollTop = 0;
-
-    if (type === 'gallery') {
-        title.textContent = 'All Artworks';
-
-        content.innerHTML = galleryCache.length
-            ? galleryCache.map(item => `
-                <div class="collection-grid-card">
-                    ${item.image_url
-                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
-                        : ''}
-                    <div class="collection-grid-info">
-                        ${item.title ? `<strong>${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.5rem;font-size:0.85rem">${escapeHtml(item.description)}</div>` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `
-                <div class="empty-state" style="grid-column:1/-1">
-                    <div class="empty-state-icon">🎨</div>
-                    <p>No artworks yet.</p>
-                </div>
-            `;
-
-    } else if (type === 'designs') {
-        title.textContent = 'All Designs';
-
-        content.innerHTML = designsCache.length
-            ? designsCache.map(item => `
-                <div class="collection-grid-card">
-                    ${item.image_url
-                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
-                        : ''}
-                    <div class="collection-grid-info">
-                        ${item.title ? `<strong>${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.5rem;font-size:0.85rem">${escapeHtml(item.description)}</div>` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `
-                <div class="empty-state" style="grid-column:1/-1">
-                    <div class="empty-state-icon">🖌️</div>
-                    <p>No designs yet.</p>
-                </div>
-            `;
-
-    } else if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid';
-
-        content.innerHTML = (blogCache && blogCache.length)
-            ? blogCache.map(item => `
-                <div class="collection-blog-card">
-                    <div class="collection-blog-meta">
-                        ${escapeHtml(item.category || 'Blog')}
-                        ${item.post_date ? ' · ' + escapeHtml(item.post_date) : ''}
-                        ${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
-                    </div>
-                    <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
-                    <div class="collection-blog-excerpt">${escapeHtml(item.excerpt || '')}</div>
-                    <div class="collection-blog-actions">
-                        <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
-                            Read Post
-                        </button>
-                        ${item.url ? `
-                            <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
-                                Open Link
-                            </a>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `
-                <div class="empty-state" style="grid-column:1/-1">
-                    <div class="empty-state-icon">✍️</div>
-                    <p>No blog posts yet.</p>
-                </div>
-            `;
-    }
-
+    // Show modal immediately with loading state
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
-}
+    content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading...</p></div>';
 
-function closeCollectionModal() {
-    const modal = document.getElementById('collectionModal');
-    const content = document.getElementById('collectionModalContent');
+    // Render after short delay so modal opens first
+    setTimeout(() => {
+        if (type === 'gallery') {
+            title.textContent = 'All Artworks';
+            if (!galleryCache.length) {
+                content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
+                return;
+            }
+            content.innerHTML = galleryCache.map(item => `
+                <div class="collection-grid-card">
+                    ${item.image_url
+                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}"
+                               onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                               loading="lazy">`
+                        : ''}
+                    <div class="collection-grid-info">
+                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.4rem;font-size:0.82rem">${escapeHtml(item.description)}</div>` : ''}
+                    </div>
+                </div>`).join('');
 
-    if (modal) modal.classList.remove('open');
-    if (content) content.scrollTop = 0;
+        } else if (type === 'designs') {
+            title.textContent = 'All Designs';
+            if (!designsCache.length) {
+                content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
+                return;
+            }
+            content.innerHTML = designsCache.map(item => `
+                <div class="collection-grid-card">
+                    ${item.image_url
+                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}"
+                               onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                               loading="lazy">`
+                        : ''}
+                    <div class="collection-grid-info">
+                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.4rem;font-size:0.82rem">${escapeHtml(item.description)}</div>` : ''}
+                    </div>
+                </div>`).join('');
 
-    document.body.style.overflow = '';
-}
-
-function openBlogReaderFromCollection(id) {
-    closeCollectionModal();
-    setTimeout(() => openBlogReader(id), 180);
+        } else if (type === 'blog') {
+            title.textContent = 'All Blog Posts';
+            if (!blogCache.length) {
+                content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No posts yet.</p></div>`;
+                return;
+            }
+            content.innerHTML = blogCache.map(item => `
+                <div class="collection-grid-card"
+                     style="padding:1.2rem;cursor:pointer;display:flex;flex-direction:column;gap:0.5rem;"
+                     onclick="openBlogReaderFromModal(${item.id})">
+                    <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">
+                        ${platformIcons[item.platform] || '✍️'}
+                        ${escapeHtml(item.category || '')}
+                        ${item.post_date ? '· ' + escapeHtml(item.post_date) : ''}
+                        ${item.platform  ? '· ' + escapeHtml(item.platform)  : ''}
+                    </div>
+                    <div style="font-size:1rem;font-weight:600;color:#fff;line-height:1.3;">
+                        ${escapeHtml(item.title || 'Untitled')}
+                    </div>
+                    ${item.excerpt
+                        ? `<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;flex:1;">${escapeHtml(item.excerpt)}</div>`
+                        : ''}
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        ${item.content
+                            ? `<span style="font-size:0.75rem;color:var(--accent);font-weight:600;">Read Post →</span>`
+                            : ''}
+                        ${item.url
+                            ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener"
+                                  onclick="event.stopPropagation()"
+                                  style="font-size:0.75rem;color:#60a5fa;font-weight:500;text-decoration:none;">
+                                  Open Link ↗
+                               </a>`
+                            : ''}
+                    </div>
+                </div>`).join('');
+        }
+    }, 50);
 }
 // ==========================================
 // BLOG READER MODAL

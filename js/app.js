@@ -834,15 +834,25 @@ async function submitContactMessage(event) {
     btn.innerHTML = originalText;
     btn.disabled = false;
 }
+function closeCollectionModal() {
+    const modal = document.getElementById('collectionModal');
+    if (modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
+}
 
+function openBlogReaderFromModal(id) {
+    closeCollectionModal();
+    setTimeout(() => openBlogReader(id), 300);
+}
 // ==========================================
 // GLOBALS FOR INLINE HTML
 // ==========================================
 
-window.openLightbox = openLightbox;
-window.closeLightbox = closeLightbox;
-window.openBlogReader = openBlogReader;
-window.closeBlogReader = closeBlogReader;
-window.openCollectionModal = openCollectionModal;
-window.closeCollectionModal = closeCollectionModal;
-window.submitContactMessage = submitContactMessage;
+window.openLightbox            = openLightbox;
+window.closeLightbox           = closeLightbox;
+window.openBlogReader          = openBlogReader;
+window.closeBlogReader         = closeBlogReader;
+window.openCollectionModal     = openCollectionModal;
+window.closeCollectionModal    = closeCollectionModal;
+window.openBlogReaderFromModal = openBlogReaderFromModal;
+window.submitContactMessage    = submitContactMessage;

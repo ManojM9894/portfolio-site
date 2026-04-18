@@ -1060,7 +1060,7 @@ select,
 .lightbox-close:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
 
 /* ==========================================
-   COLLECTION MODAL
+   VIEW ALL MODAL — FINAL CLEAN FIX
 ========================================== */
 .collection-modal {
     position: fixed;
@@ -1068,26 +1068,22 @@ select,
     display: none;
     z-index: 9999;
 }
-
 .collection-modal.open {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .collection-modal-backdrop {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.88);
     backdrop-filter: blur(8px);
 }
-
 .collection-modal-panel {
     position: relative;
     z-index: 1;
     width: min(1180px, calc(100% - 32px));
     height: min(88vh, 920px);
-    margin: 20px auto;
     background: #0d0d0d;
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -1095,7 +1091,6 @@ select,
     display: flex;
     flex-direction: column;
 }
-
 .collection-modal-header {
     display: flex;
     align-items: center;
@@ -1104,7 +1099,6 @@ select,
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
 }
-
 .collection-modal-header h3 {
     font-size: 0.82rem;
     text-transform: uppercase;
@@ -1112,7 +1106,6 @@ select,
     color: var(--text-primary);
     font-weight: 600;
 }
-
 .collection-close {
     background: transparent;
     border: 1px solid var(--border);
@@ -1125,12 +1118,10 @@ select,
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
-
 .collection-close:hover {
     border-color: rgba(255,255,255,0.2);
     color: #fff;
 }
-
 .collection-modal-content {
     flex: 1;
     min-height: 0;
@@ -1141,10 +1132,8 @@ select,
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
     align-content: start;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255,107,26,0.45) transparent;
+    scrollbar-color: rgba(255, 107, 26, 0.4) transparent;
 }
 
 .collection-modal-content::-webkit-scrollbar {
@@ -1156,7 +1145,7 @@ select,
 }
 
 .collection-modal-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 107, 26, 0.45);
+    background: rgba(255, 107, 26, 0.4);
     border-radius: 999px;
 }
 
@@ -1164,19 +1153,19 @@ select,
     background: rgba(255, 107, 26, 0.7);
 }
 
-/* art/design cards */
 .collection-grid-card {
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
+    cursor: pointer;
     transition: all 0.25s ease;
 }
 
 .collection-grid-card:hover {
-    border-color: rgba(255,255,255,0.15);
+    border-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(255,255,255,0.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
 .collection-grid-card img {
@@ -1184,7 +1173,6 @@ select,
     height: 200px;
     object-fit: cover;
     display: block;
-    cursor: pointer;
 }
 
 .collection-grid-info {

@@ -436,6 +436,11 @@ function openCollectionModal(type) {
         }
     }, 50);
 }
+function closeCollectionModal() {
+    const modal = document.getElementById('collectionModal');
+    if (modal) modal.classList.remove('open');
+    document.body.style.overflow = '';
+}
 // ==========================================
 // BLOG READER MODAL
 // ==========================================
@@ -715,11 +720,6 @@ function initLightbox() {
         });
     }
 
-    const collectionModal = document.getElementById('collectionModal');
-    if (collectionModal) {
-        collectionModal.querySelector('.collection-modal-backdrop')
-            ?.addEventListener('click', closeCollectionModal);
-    }
 }
 
 // ==========================================

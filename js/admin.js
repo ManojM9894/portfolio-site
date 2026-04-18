@@ -109,54 +109,26 @@ async function updateDashboard() {
 
     const skills = profileRes?.data?.[0]?.skills;
     setText("stat-skills", Array.isArray(skills) ? skills.length : 0);
-
   } catch (err) {
     console.error("Dashboard error:", err);
   }
 }
 
 function showPage(name, buttonEl) {
-  document.querySelectorAll(".page").forEach(page => {
-    page.classList.remove("active");
-  });
-
-  document.querySelectorAll(".sidebar-item").forEach(item => {
-    item.classList.remove("active");
-  });
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  document.querySelectorAll(".sidebar-item").forEach(item => item.classList.remove("active"));
 
   const target = document.getElementById(`page-${name}`);
   if (target) target.classList.add("active");
-
   if (buttonEl) buttonEl.classList.add("active");
-}
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("admin.js loaded");
   console.log("supabaseClient:", window.supabaseClient);
-
   await applyAuthState();
-
-  const passwordInput = document.getElementById("login-password");
-  if (passwordInput) {
-    passwordInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") signInAdmin();
-    });
-  }
 });
 
 window.signInAdmin = signInAdmin;
 window.signOutAdmin = signOutAdmin;
 window.showPage = showPage;
-window.showToast = showToast;

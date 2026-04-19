@@ -827,132 +827,6 @@ function initNavbarScrollEffect() {
 
     updateNav();
 }
-let lightboxImages = [];
-let lightboxIndex = 0;
-let lightboxTouchStartX = 0;
-let lightboxTouchEndX = 0;
-
-function openLightbox(src, images = []) {
-    if (!src) return;
-
-    const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-    const content = document.getElementById('lightboxContent');
-
-    if (!lightbox || !img || !content) return;
-
-    lightboxImages = Array.isArray(images) && images.length
-        ? images.filter(Boolean)
-        : [src];
-
-    lightboxIndex = Math.max(0, lightboxImages.indexOf(src));
-    if (lightboxIndex === -1) lightboxIndex = 0;
-
-    img.src = lightboxImages[lightboxIndex];
-    lightbox.classList.add('active');
-    document.body.classList.add('modal-open');
-
-    content.ontouchstart = (e) => {
-        if (!e.touches[0]) return;
-        lightboxTouchStartX = e.touches[0].clientX;
-    };
-
-    content.ontouchmove = (e) => {
-        if (!e.touches[0]) return;
-        lightboxTouchEndX = e.touches[0].clientX;
-    };
-
-    content.ontouchend = () => {
-        const delta = lightboxTouchStartX - lightboxTouchEndX;
-        if (Math.abs(delta) < 40) return;
-
-        if (delta > 0) {
-            showNextLightboxImage();
-        } else {
-            showPrevLightboxImage();
-        }
-    };
-}
-
-function showNextLightboxImage() {
-    if (!lightboxImages.length) return;
-    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
-    const img = document.getElementById('lightboxImg');
-    if (img) img.src = lightboxImages[lightboxIndex];
-}
-
-function showPrevLightboxImage() {
-    if (!lightboxImages.length) return;
-    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
-    const img = document.getElementById('lightboxImg');
-    if (img) img.src = lightboxImages[lightboxIndex];
-}
-
-function closeLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    if (lightbox) lightbox.classList.remove('active');
-    document.body.classList.remove('modal-open');
-}
-// ==========================================
-// CONTACT FORM
-// ==========================================
-
-function initContactForm() {
-    const contactForm = document.getElementById('contactForm');
-    if (!contactForm) return;
-
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const btn          = contactForm.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML      = 'Sending... ⏳';
-        btn.disabled       = true;
-
-        const inputs  = contactForm.querySelectorAll('input, textarea');
-        const name    = inputs[0]?.value.trim() || '';
-        const email   = inputs[1]?.value.trim() || '';
-        const subject = inputs[2]?.value.trim() || '';
-        const message = inputs[3]?.value.trim() || '';
-
-        if (!name || !email || !message) {
-            showToast('⚠️ Please fill in all required fields.');
-            btn.innerHTML = originalText;
-            btn.disabled  = false;
-            return;
-        }
-
-        try {
-            const { error } = await supabaseClient
-                .from('messages')
-                .insert([{ name, email, subject, message }]);
-
-            if (error) throw error;
-
-            showToast('✅ Message sent! I will get back to you soon.');
-            contactForm.reset();
-
-        } catch (err) {
-            console.error('Message error:', err);
-            showToast('❌ Failed to send. Please email directly.');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled  = false;
-        }
-    });
-}
-
-// ==========================================
-// TOAST
-// ==========================================
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-}
 /* ==========================================
    LIGHTBOX
 ========================================== */
@@ -1064,6 +938,67 @@ function initLightboxSwipe() {
 
 function initLightbox() {
     initLightboxSwipe();
+}
+
+// ==========================================
+// CONTACT FORM
+// ==========================================
+
+function initContactForm() {
+    const contactForm = document.getElementById('contactForm');
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn          = contactForm.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML      = 'Sending... ⏳';
+        btn.disabled       = true;
+
+        const inputs  = contactForm.querySelectorAll('input, textarea');
+        const name    = inputs[0]?.value.trim() || '';
+        const email   = inputs[1]?.value.trim() || '';
+        const subject = inputs[2]?.value.trim() || '';
+        const message = inputs[3]?.value.trim() || '';
+
+        if (!name || !email || !message) {
+            showToast('⚠️ Please fill in all required fields.');
+            btn.innerHTML = originalText;
+            btn.disabled  = false;
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{ name, email, subject, message }]);
+
+            if (error) throw error;
+
+            showToast('✅ Message sent! I will get back to you soon.');
+            contactForm.reset();
+
+        } catch (err) {
+            console.error('Message error:', err);
+            showToast('❌ Failed to send. Please email directly.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled  = false;
+        }
+    });
+}
+
+// ==========================================
+// TOAST
+// ==========================================
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 // ==========================================

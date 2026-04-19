@@ -33,9 +33,6 @@ let blogCache    = [];
 let galleryCache = [];
 let designsCache = [];
 let profileCache = null;
-let lightboxImages = [];
-let lightboxIndex  = 0;
-
 // ==========================================
 // DATA FETCHING
 // ==========================================
@@ -613,36 +610,20 @@ function renderCollectionModalContent(type) {
             : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
     }
 
-    else if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid';
+   else if (type === 'blog') {
+    title.textContent = 'All Blog Posts';
+    content.className = 'collection-modal-content blog-collection-grid ios-notes-grid';
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
-                <div class="collection-blog-card">
-                    <div class="collection-blog-meta">
-                        ${escapeHtml(item.category || 'Blog')}
-                        ${item.post_date ? ' · ' + escapeHtml(item.post_date) : ''}
-                        ${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
-                    </div>
-                    <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
-                    <div class="collection-blog-excerpt">${escapeHtml(item.excerpt || '')}</div>
-                    <div class="collection-blog-actions">
-                        ${item.content ? `
-                            <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
-                                Read Post
-                            </button>
-                        ` : ''}
-                        ${item.url ? `
-                            <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
-                                Open Link
-                            </a>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
-    }
+    content.innerHTML = visibleItems.length
+        ? visibleItems.map(item => `
+            <div class="collection-blog-card ios-note-card">
+                <button class="ios-note-button" onclick="openBlogReaderFromCollection(${item.id})">
+                    <span class="ios-note-title">${escapeHtml(item.title || 'Untitled')}</span>
+                </button>
+            </div>
+        `).join('')
+        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+}
 
     if (allItems.length > collectionRenderState.limit) {
         content.innerHTML += `
@@ -727,7 +708,26 @@ function loadMoreCollectionItems() {
     collectionRenderState.limit += 20;
     renderCollectionModalContent(collectionRenderState.type);
 }
+const panel = document.querySelector('.collection-modal-panel');
+if (panel) {
+    panel.ontouchstart = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchStartY = e.touches[0].clientY;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
 
+    panel.ontouchmove = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
+
+    panel.ontouchend = () => {
+        const deltaY = collectionTouchEndY - collectionTouchStartY;
+        if (deltaY > 80) {
+            closeCollectionModal();
+        }
+    };
+}
 function closeCollectionModal() {
     const modal = document.getElementById('collectionModal');
     const content = document.getElementById('collectionModalContent');
@@ -827,160 +827,71 @@ function initNavbarScrollEffect() {
 
     updateNav();
 }
-// Light BOX
-function openLightbox(src) {
+let lightboxImages = [];
+let lightboxIndex = 0;
+let lightboxTouchStartX = 0;
+let lightboxTouchEndX = 0;
+
+function openLightbox(src, images = []) {
     if (!src) return;
+
     const lightbox = document.getElementById('lightbox');
-    const img      = document.getElementById('lightboxImg');
-    if (!lightbox || !img) return;
+    const img = document.getElementById('lightboxImg');
+    const content = document.getElementById('lightboxContent');
 
-    lightboxIndex = lightboxImages.indexOf(src);
-    if (lightboxIndex === -1) { lightboxImages = [src]; lightboxIndex = 0; }
+    if (!lightbox || !img || !content) return;
 
-    img.src = src;
-    img.style.transform = 'scale(1)';
-    img.style.transition = '';
+    lightboxImages = Array.isArray(images) && images.length
+        ? images.filter(Boolean)
+        : [src];
+
+    lightboxIndex = Math.max(0, lightboxImages.indexOf(src));
+    if (lightboxIndex === -1) lightboxIndex = 0;
+
+    img.src = lightboxImages[lightboxIndex];
     lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+
+    content.ontouchstart = (e) => {
+        if (!e.touches[0]) return;
+        lightboxTouchStartX = e.touches[0].clientX;
+    };
+
+    content.ontouchmove = (e) => {
+        if (!e.touches[0]) return;
+        lightboxTouchEndX = e.touches[0].clientX;
+    };
+
+    content.ontouchend = () => {
+        const delta = lightboxTouchStartX - lightboxTouchEndX;
+        if (Math.abs(delta) < 40) return;
+
+        if (delta > 0) {
+            showNextLightboxImage();
+        } else {
+            showPrevLightboxImage();
+        }
+    };
+}
+
+function showNextLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+    const img = document.getElementById('lightboxImg');
+    if (img) img.src = lightboxImages[lightboxIndex];
+}
+
+function showPrevLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    const img = document.getElementById('lightboxImg');
+    if (img) img.src = lightboxImages[lightboxIndex];
 }
 
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
-    const img      = document.getElementById('lightboxImg');
     if (lightbox) lightbox.classList.remove('active');
-    if (img) { img.style.transform = 'scale(1)'; img.src = ''; }
-    document.body.style.overflow = '';
-}
-
-function initLightboxSwipe() {
-    const lightbox = document.getElementById('lightbox');
-    const img      = document.getElementById('lightboxImg');
-    if (!lightbox || !img) return;
-
-    let scale = 1, lastScale = 1, startDist = 0;
-    let posX = 0, posY = 0, lastPosX = 0, lastPosY = 0;
-    let touchStartX = 0, touchStartY = 0;
-    let isPinching = false, isDragging = false;
-    let lastTap = 0;
-    let mouseStartX = 0, isMouseDown = false;
-
-    function dist(t) {
-        return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    }
-
-    function applyTransform() {
-        img.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`;
-    }
-
-    function goTo(idx) {
-        if (!lightboxImages.length) return;
-        if (idx < 0) idx = lightboxImages.length - 1;
-        if (idx >= lightboxImages.length) idx = 0;
-        lightboxIndex = idx;
-        img.style.opacity = '0';
-        img.style.transition = 'opacity 0.18s ease';
-        setTimeout(() => {
-            img.src = lightboxImages[lightboxIndex];
-            scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
-            applyTransform();
-            img.style.opacity = '1';
-        }, 180);
-    }
-
-    // ---- TOUCH ----
-    lightbox.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            isPinching = true;
-            startDist  = dist(e.touches);
-            lastScale  = scale;
-        } else {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            isDragging  = scale > 1;
-        }
-    }, { passive: true });
-
-    lightbox.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2 && isPinching) {
-            e.preventDefault();
-            scale = Math.min(Math.max(lastScale * dist(e.touches) / startDist, 1), 4);
-            applyTransform();
-        } else if (e.touches.length === 1 && isDragging) {
-            e.preventDefault();
-            posX = lastPosX + e.touches[0].clientX - touchStartX;
-            posY = lastPosY + e.touches[0].clientY - touchStartY;
-            applyTransform();
-        }
-    }, { passive: false });
-
-    lightbox.addEventListener('touchend', (e) => {
-        isPinching = false;
-        if (isDragging) {
-            lastPosX = posX; lastPosY = posY;
-            isDragging = false;
-            return;
-        }
-        // Swipe when not zoomed
-        if (scale <= 1) {
-            const dx = e.changedTouches[0].clientX - touchStartX;
-            const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-            if (Math.abs(dx) > 55 && dy < 100) {
-                dx < 0 ? goTo(lightboxIndex + 1) : goTo(lightboxIndex - 1);
-                return;
-            }
-        }
-        // Double tap
-        const now = Date.now();
-        if (now - lastTap < 280) {
-            if (scale > 1) {
-                scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
-            } else {
-                scale = 2.5;
-            }
-            applyTransform();
-        }
-        lastTap = now;
-        if (scale <= 1) {
-            scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
-            applyTransform();
-        }
-    });
-
-    // ---- MOUSE (desktop swipe) ----
-    lightbox.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.lightbox-close')) return;
-        isMouseDown = true;
-        mouseStartX = e.clientX;
-        lightbox.style.cursor = 'grabbing';
-    });
-
-    lightbox.addEventListener('mouseup', (e) => {
-        if (!isMouseDown) return;
-        isMouseDown = false;
-        lightbox.style.cursor = '';
-        const dx = e.clientX - mouseStartX;
-        if (Math.abs(dx) > 55) {
-            dx < 0 ? goTo(lightboxIndex + 1) : goTo(lightboxIndex - 1);
-        }
-    });
-
-    lightbox.addEventListener('mouseleave', () => {
-        isMouseDown = false;
-        lightbox.style.cursor = '';
-    });
-
-    // ---- CLICK to close backdrop ----
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-
-    // ---- KEYBOARD ----
-    document.addEventListener('keydown', (e) => {
-        if (!lightbox.classList.contains('active')) return;
-        if (e.key === 'ArrowRight') goTo(lightboxIndex + 1);
-        if (e.key === 'ArrowLeft')  goTo(lightboxIndex - 1);
-        if (e.key === 'Escape')     closeLightbox();
-    });
+    document.body.classList.remove('modal-open');
 }
 // ==========================================
 // CONTACT FORM
@@ -1208,3 +1119,7 @@ window.openCollectionModal     = openCollectionModal;
 window.closeCollectionModal    = closeCollectionModal;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
 window.submitContactMessage    = submitContactMessage;
+window.closeLightbox = closeLightbox;
+window.showNextLightboxImage = showNextLightboxImage;
+window.showPrevLightboxImage = showPrevLightboxImage;
+window.openBlogReaderFromCollection = openBlogReaderFromCollection;

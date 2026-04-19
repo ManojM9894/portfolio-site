@@ -174,49 +174,36 @@ function initCenterCarousels() {
 
 wrap.addEventListener('touchstart', (e) => {
     if (!e.touches[0]) return;
-
     isDragging = true;
     startX = e.touches[0].clientX;
     dragStartPosition = position;
-
-    touchLastX = startX;
-    touchLastTime = performance.now();
-
-    wrap.classList.add('is-dragging');
+    velocity = 0;
 }, { passive: true });
 
 wrap.addEventListener('touchmove', (e) => {
     if (!isDragging || !e.touches[0]) return;
-
-    const x = e.touches[0].clientX;
-    const dxFromStart = x - startX;
-
-    position = dragStartPosition + dxFromStart;
-
-    const now = performance.now();
-    const dx = x - touchLastX;
-    const dt = Math.max(now - touchLastTime, 16);
-
-    velocity = -(dx / dt) * 7;
-
-    touchLastX = x;
-    touchLastTime = now;
-
+    const dx = e.touches[0].clientX - startX;
+    position = dragStartPosition + dx;
     render();
+}, { passive: true });
 
-    if (Math.abs(dxFromStart) > 6) {
+wrap.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const dx = (e.changedTouches[0]?.clientX || startX) - startX;
+    addImpulse(-(dx * 0.04));
+});
+wrap.addEventListener('touchmove', (e) => {
+    if (!isDragging || !e.touches[0]) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = Math.abs(e.touches[0].clientY - (e.touches[0].clientY || 0));
+    // Only prevent default if horizontal swipe
+    if (Math.abs(dx) > 10) {
         e.preventDefault();
     }
+    position = dragStartPosition + dx;
+    render();
 }, { passive: false });
-
-wrap.addEventListener('touchend', () => {
-    isDragging = false;
-    wrap.classList.remove('is-dragging');
-
-    if (Math.abs(velocity) < 0.45) {
-        velocity = velocity < 0 ? -0.45 : 0.45;
-    }
-});
 
         function applyDockEffect() {
             const wrapRect = wrap.getBoundingClientRect();

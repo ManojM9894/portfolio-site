@@ -618,6 +618,50 @@ function renderCollectionModalContent(type) {
         `;
     }
 }
+// ==========================================
+// BLOG READER
+// ==========================================
+
+function openBlogReader(id) {
+    const post = blogCache.find(item => Number(item.id) === Number(id));
+    if (!post) return;
+
+    const modal      = document.getElementById('blogReaderModal');
+    const titleEl    = document.getElementById('readerModalTitle');
+    const metaEl     = document.getElementById('readerModalMeta');
+    const contentEl  = document.getElementById('readerModalContent');
+    const externalEl = document.getElementById('readerModalExternal');
+
+    if (titleEl) titleEl.textContent = post.title || 'Blog Post';
+    if (metaEl) {
+        const parts = [];
+        if (post.category)  parts.push(post.category);
+        if (post.post_date) parts.push(post.post_date);
+        if (post.platform)  parts.push(post.platform);
+        metaEl.textContent = parts.join(' · ');
+    }
+    if (contentEl)  contentEl.innerHTML  = post.content || '<p>No content available.</p>';
+    if (externalEl) externalEl.innerHTML = post.url
+        ? `<a href="${post.url}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${post.platform || 'External'} →</a>`
+        : '';
+
+    if (modal) {
+        modal.style.display = 'block';
+        modal.scrollTop = 0;
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeBlogReader() {
+    const modal = document.getElementById('blogReaderModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function openBlogReaderFromModal(id) {
+    closeCollectionModal();
+    setTimeout(() => openBlogReader(id), 300);
+}
 
 function openCollectionModal(type) {
     const modal = document.getElementById('collectionModal');

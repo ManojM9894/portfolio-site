@@ -1073,6 +1073,7 @@ select,
     display: flex !important;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .collection-modal-backdrop {
@@ -1085,9 +1086,11 @@ select,
 
 .collection-modal-panel {
     position: relative;
-    z-index: 99999 !important;
-    width: min(1180px, calc(100% - 32px));
-    height: min(88vh, 920px);
+    z-index: 99999;
+    width: 90vw;
+    max-width: 1180px;
+    height: 88vh;
+    max-height: 920px;
     background: #0d0d0d;
     border: 1px solid var(--border);
     border-radius: 16px;

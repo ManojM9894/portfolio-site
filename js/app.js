@@ -29,8 +29,7 @@ const platformIcons = {
     '': '✍️'
 };
 
-let blogCache    = [];
-let galleryCache = [];
+let blogCache = [];
 let designsCache = [];
 let profileCache = null;
 // ==========================================
@@ -92,14 +91,14 @@ function renderHeroFromProfile(profile) {
 
     const { first, last } = splitName(profile.name);
 
-    const heroFirst   = document.getElementById('hero-first-name');
-    const heroLast    = document.getElementById('hero-last-name');
-    const heroTitle   = document.getElementById('hero-title');
+    const heroFirst = document.getElementById('hero-first-name');
+    const heroLast = document.getElementById('hero-last-name');
+    const heroTitle = document.getElementById('hero-title');
     const heroTagline = document.getElementById('hero-tagline');
 
-    if (heroFirst)   heroFirst.textContent   = first || '';
-    if (heroLast)    heroLast.textContent    = last  || '';
-    if (heroTitle)   heroTitle.textContent   = profile.title   || '';
+    if (heroFirst) heroFirst.textContent = first || '';
+    if (heroLast) heroLast.textContent = last || '';
+    if (heroTitle) heroTitle.textContent = profile.title || '';
     if (heroTagline) heroTagline.textContent = profile.tagline || '';
 }
 
@@ -110,15 +109,15 @@ async function renderAbout() {
 
         renderHeroFromProfile(about);
 
-        const nameEl   = document.getElementById('about-name');
-        const bio1El   = document.getElementById('about-bio1');
-        const bio2El   = document.getElementById('about-bio2');
+        const nameEl = document.getElementById('about-name');
+        const bio1El = document.getElementById('about-bio1');
+        const bio2El = document.getElementById('about-bio2');
         const skillsEl = document.getElementById('about-skills');
         const avatarEl = document.getElementById('about-avatar');
 
-        if (nameEl)   nameEl.textContent   = about.name || '';
-        if (bio1El)   bio1El.textContent   = about.bio1 || '';
-        if (bio2El)   bio2El.textContent   = about.bio2 || '';
+        if (nameEl) nameEl.textContent = about.name || '';
+        if (bio1El) bio1El.textContent = about.bio1 || '';
+        if (bio2El) bio2El.textContent = about.bio2 || '';
 
         if (avatarEl) {
             avatarEl.innerHTML = about.avatar_url
@@ -169,29 +168,29 @@ function initCenterCarousels() {
         let touchLastX = 0;
         let touchLastTime = 0;
 
-       wrap.style.touchAction = 'pan-y';
+        wrap.style.touchAction = 'pan-y';
 
-wrap.addEventListener('touchstart', (e) => {
-    if (!e.touches[0]) return;
-    isDragging = true;
-    startX = e.touches[0].clientX;
-    dragStartPosition = position;
-    velocity = 0;
-}, { passive: true });
+        wrap.addEventListener('touchstart', (e) => {
+            if (!e.touches[0]) return;
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            dragStartPosition = position;
+            velocity = 0;
+        }, { passive: true });
 
-wrap.addEventListener('touchmove', (e) => {
-    if (!isDragging || !e.touches[0]) return;
-    const dx = e.touches[0].clientX - startX;
-    position = dragStartPosition + dx;
-    render();
-}, { passive: true });
+        wrap.addEventListener('touchmove', (e) => {
+            if (!isDragging || !e.touches[0]) return;
+            const dx = e.touches[0].clientX - startX;
+            position = dragStartPosition + dx;
+            render();
+        }, { passive: true });
 
-wrap.addEventListener('touchend', (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    const dx = (e.changedTouches[0]?.clientX || startX) - startX;
-    addImpulse(-(dx * 0.04));
-});
+        wrap.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const dx = (e.changedTouches[0]?.clientX || startX) - startX;
+            addImpulse(-(dx * 0.04));
+        });
 
         function applyDockEffect() {
             const wrapRect = wrap.getBoundingClientRect();
@@ -288,12 +287,12 @@ wrap.addEventListener('touchend', (e) => {
             { passive: true }
         );
 
-      wrap.addEventListener('touchmove', (e) => {
-    if (!isDragging || !e.touches[0]) return;
-    const dx = e.touches[0].clientX - startX;
-    position = dragStartPosition + dx;
-    render();
-    }, { passive: true });
+        wrap.addEventListener('touchmove', (e) => {
+            if (!isDragging || !e.touches[0]) return;
+            const dx = e.touches[0].clientX - startX;
+            position = dragStartPosition + dx;
+            render();
+        }, { passive: true });
 
         wrap.addEventListener('touchend', () => {
             isDragging = false;
@@ -477,11 +476,11 @@ async function renderBlog() {
                                 <div class="blog-scroll-excerpt">${escapeHtml(item.excerpt || '')}</div>
                                 <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap">
                                     ${item.content
-                                        ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
-                                        : ''}
+                ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
+                : ''}
                                     ${item.url
-                                        ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
-                                        : ''}
+                ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
+                : ''}
                                 </div>
                             </div>`).join('')}
                     </div>
@@ -489,7 +488,7 @@ async function renderBlog() {
             </div>`;
 
         initCenterCarousels();
-    } catch(e) {
+    } catch (e) {
         console.error('Blog error:', e);
         list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to load blog.</p></div>`;
     }
@@ -523,8 +522,8 @@ function renderRecentWorks() {
             <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${merged.length}">
                 <div class="recent-works-track">
                     ${loopItems.map(item => {
-                        if (item.type === 'blog') {
-                            return `
+        if (item.type === 'blog') {
+            return `
                                 <div class="recent-work-card">
                                     <div class="recent-work-image"
                                         style="display:flex;align-items:flex-end;padding:1rem;background:var(--surface);cursor:pointer"
@@ -532,17 +531,17 @@ function renderRecentWorks() {
                                         ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                     </div>
                                 </div>`;
-                        }
-                        return `
+        }
+        return `
                             <div class="recent-work-card">
                                 <div class="recent-work-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
                                     ${item.image_url
-                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
+                ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
+                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
                                     ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                 </div>
                             </div>`;
-                    }).join('')}
+    }).join('')}
                 </div>
             </div>
         </div>`;
@@ -628,12 +627,12 @@ function renderCollectionModalContent(type) {
             : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
     }
 
-   else if (type === 'blog') {
-    title.textContent = 'All Blog Posts';
-    content.className = 'collection-modal-content blog-collection-grid ios-notes-grid';
+    else if (type === 'blog') {
+        title.textContent = 'All Blog Posts';
+        content.className = 'collection-modal-content blog-collection-grid ios-notes-grid';
 
-    content.innerHTML = visibleItems.length
-        ? visibleItems.map(item => `
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
             <div class="ios-note-title">
     ${escapeHtml(item.title || 'Untitled')}
 </div>
@@ -642,8 +641,8 @@ function renderCollectionModalContent(type) {
                 </button>
             </div>
         `).join('')
-        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
-}
+            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+    }
 
     if (allItems.length > collectionRenderState.limit) {
         content.innerHTML += `
@@ -663,21 +662,21 @@ function openBlogReader(id) {
     const post = blogCache.find(item => Number(item.id) === Number(id));
     if (!post) return;
 
-    const modal      = document.getElementById('blogReaderModal');
-    const titleEl    = document.getElementById('readerModalTitle');
-    const metaEl     = document.getElementById('readerModalMeta');
-    const contentEl  = document.getElementById('readerModalContent');
+    const modal = document.getElementById('blogReaderModal');
+    const titleEl = document.getElementById('readerModalTitle');
+    const metaEl = document.getElementById('readerModalMeta');
+    const contentEl = document.getElementById('readerModalContent');
     const externalEl = document.getElementById('readerModalExternal');
 
     if (titleEl) titleEl.textContent = post.title || 'Blog Post';
     if (metaEl) {
         const parts = [];
-        if (post.category)  parts.push(post.category);
+        if (post.category) parts.push(post.category);
         if (post.post_date) parts.push(post.post_date);
-        if (post.platform)  parts.push(post.platform);
+        if (post.platform) parts.push(post.platform);
         metaEl.textContent = parts.join(' · ');
     }
-    if (contentEl)  contentEl.innerHTML  = post.content || '<p>No content available.</p>';
+    if (contentEl) contentEl.innerHTML = post.content || '<p>No content available.</p>';
     if (externalEl) externalEl.innerHTML = post.url
         ? `<a href="${post.url}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${post.platform || 'External'} →</a>`
         : '';
@@ -784,9 +783,9 @@ function openBlogReaderFromModal(id) {
 // ==========================================
 
 function initAdminMenu() {
-    const adminMenuBtn  = document.getElementById('adminMenuBtn');
+    const adminMenuBtn = document.getElementById('adminMenuBtn');
     const adminDropdown = document.getElementById('adminDropdown');
-    const openAdminBtn  = document.getElementById('openAdminBtn');
+    const openAdminBtn = document.getElementById('openAdminBtn');
 
     if (adminMenuBtn && adminDropdown) {
         adminMenuBtn.addEventListener('click', (event) => {
@@ -1035,21 +1034,21 @@ function initContactForm() {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const btn          = contactForm.querySelector('button[type="submit"]');
+        const btn = contactForm.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
-        btn.innerHTML      = 'Sending... ⏳';
-        btn.disabled       = true;
+        btn.innerHTML = 'Sending... ⏳';
+        btn.disabled = true;
 
-        const inputs  = contactForm.querySelectorAll('input, textarea');
-        const name    = inputs[0]?.value.trim() || '';
-        const email   = inputs[1]?.value.trim() || '';
+        const inputs = contactForm.querySelectorAll('input, textarea');
+        const name = inputs[0]?.value.trim() || '';
+        const email = inputs[1]?.value.trim() || '';
         const subject = inputs[2]?.value.trim() || '';
         const message = inputs[3]?.value.trim() || '';
 
         if (!name || !email || !message) {
             showToast('⚠️ Please fill in all required fields.');
             btn.innerHTML = originalText;
-            btn.disabled  = false;
+            btn.disabled = false;
             return;
         }
 
@@ -1068,7 +1067,7 @@ function initContactForm() {
             showToast('❌ Failed to send. Please email directly.');
         } finally {
             btn.innerHTML = originalText;
-            btn.disabled  = false;
+            btn.disabled = false;
         }
     });
 }
@@ -1091,8 +1090,8 @@ function showToast(msg) {
 
 function initNav() {
     const hamburger = document.querySelector('.hamburger');
-    const navMenu   = document.querySelector('.nav-links');
-    const navLinks  = document.querySelectorAll('.nav-links a');
+    const navMenu = document.querySelector('.nav-links');
+    const navLinks = document.querySelectorAll('.nav-links a');
 
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
@@ -1115,9 +1114,9 @@ function initNav() {
 }
 
 function initAdminMenu() {
-    const btn      = document.getElementById('adminMenuBtn');
+    const btn = document.getElementById('adminMenuBtn');
     const dropdown = document.getElementById('adminDropdown');
-    const openBtn  = document.getElementById('openAdminBtn');
+    const openBtn = document.getElementById('openAdminBtn');
 
     if (btn && dropdown) {
         btn.addEventListener('click', e => {
@@ -1146,19 +1145,19 @@ function initContactForm() {
     if (!form) return;
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        const btn  = form.querySelector('button[type="submit"]');
+        const btn = form.querySelector('button[type="submit"]');
         const orig = btn.innerHTML;
         btn.innerHTML = 'Sending... ⏳';
-        btn.disabled  = true;
-        const inputs  = form.querySelectorAll('input, textarea');
-        const name    = inputs[0]?.value.trim() || '';
-        const email   = inputs[1]?.value.trim() || '';
+        btn.disabled = true;
+        const inputs = form.querySelectorAll('input, textarea');
+        const name = inputs[0]?.value.trim() || '';
+        const email = inputs[1]?.value.trim() || '';
         const subject = inputs[2]?.value.trim() || '';
         const message = inputs[3]?.value.trim() || '';
         if (!name || !email || !message) {
             showToast('⚠️ Please fill in all required fields.');
             btn.innerHTML = orig;
-            btn.disabled  = false;
+            btn.disabled = false;
             return;
         }
         try {
@@ -1166,11 +1165,11 @@ function initContactForm() {
             if (error) throw error;
             showToast('✅ Message sent!');
             form.reset();
-        } catch(err) {
+        } catch (err) {
             showToast('❌ Failed to send. Please email directly.');
         } finally {
             btn.innerHTML = orig;
-            btn.disabled  = false;
+            btn.disabled = false;
         }
     });
 }
@@ -1235,14 +1234,14 @@ async function submitContactMessage(event) {
 // ==========================================
 // GLOBALS
 // ==========================================
-window.openLightbox            = openLightbox;
-window.closeLightbox           = closeLightbox;
-window.openBlogReader          = openBlogReader;
-window.closeBlogReader         = closeBlogReader;
-window.openCollectionModal     = openCollectionModal;
-window.closeCollectionModal    = closeCollectionModal;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+window.openBlogReader = openBlogReader;
+window.closeBlogReader = closeBlogReader;
+window.openCollectionModal = openCollectionModal;
+window.closeCollectionModal = closeCollectionModal;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
-window.submitContactMessage    = submitContactMessage;
+window.submitContactMessage = submitContactMessage;
 window.closeLightbox = closeLightbox;
 window.showNextLightboxImage = showNextLightboxImage;
 window.showPrevLightboxImage = showPrevLightboxImage;

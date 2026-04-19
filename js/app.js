@@ -326,51 +326,89 @@ wrap.addEventListener('touchmove', (e) => {
 // GALLERY
 // ==========================================
 
+const galleryCache = [];
+const designsCache = [];
+const blogCache = [];
+
+function buildGalleryCard(item) {
+    const imageUrl = item?.image_url || '';
+    const title = item?.title || '';
+
+    return `
+        <div class="carousel-card">
+            <div class="carousel-image" onclick="openGalleryLightbox('${escapeAttr(imageUrl)}')">
+                ${imageUrl ? `
+                    <img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}">
+                ` : `
+                    <div class="empty-state">🎨</div>
+                `}
+                <div class="image-title-overlay">
+                    <span>${escapeHtml(title)}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function buildDesignCard(item) {
+    const imageUrl = item?.image_url || '';
+    const title = item?.title || '';
+
+    return `
+        <div class="carousel-card">
+            <div class="carousel-image" onclick="openDesignLightbox('${escapeAttr(imageUrl)}')">
+                ${imageUrl ? `
+                    <img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}">
+                ` : `
+                    <div class="empty-state">🖌️</div>
+                `}
+                <div class="image-title-overlay">
+                    <span>${escapeHtml(title)}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
 async function renderGallery() {
-    const grid = document.getElementById('galleryGrid');
-    if (!grid) return;
+    const container = document.getElementById('galleryGrid');
+    if (!container) return;
 
     try {
         const items = await fetchGallery();
-        galleryCache = items;
+        galleryCache.length = 0;
+        galleryCache.push(...items);
 
         if (!items.length) {
-            grid.innerHTML = `
+            container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">🎨</div>
-                    <p>Your artwork will appear here.<br>Upload your work via the Admin panel!</p>
-                </div>`;
+                    <p>No artworks yet.</p>
+                </div>
+            `;
             return;
         }
 
-        const loopItems = [...items, ...items, ...items];
-        lightboxImages = galleryCache.map(i => i.image_url).filter(Boolean);
-        grid.innerHTML = `
+        const repeated = [...items, ...items, ...items];
+
+        container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
                     <div class="carousel-track">
-                        ${loopItems.map(item => `
-                            <div class="carousel-card">
-                                <div class="carousel-image" onclick="openGalleryLightbox('${escapeAttr(item.image_url || '')}')"
-                                    ${item.image_url
-                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🎨</div>`}
-                                    ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${repeated.map(buildGalleryCard).join('')}
                     </div>
                 </div>
-            </div>`;
+            </div>
+        `;
 
         initCenterCarousels();
     } catch (error) {
         console.error('Failed to load gallery:', error);
-        grid.innerHTML = `
+        container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">⚠️</div>
                 <p>Failed to load gallery.</p>
-            </div>`;
+            </div>
+        `;
     }
 }
 
@@ -379,53 +417,47 @@ async function renderGallery() {
 // ==========================================
 
 async function renderDesigns() {
-    const grid = document.getElementById('designsGrid');
-    if (!grid) return;
+    const container = document.getElementById('designsGrid');
+    if (!container) return;
 
     try {
         const items = await fetchDesigns();
-        designsCache = items;
+        designsCache.length = 0;
+        designsCache.push(...items);
 
         if (!items.length) {
-            grid.innerHTML = `
+            container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">🖌️</div>
-                    <p>Your design projects will appear here.<br>Upload your work via the Admin panel!</p>
-                </div>`;
+                    <p>No designs yet.</p>
+                </div>
+            `;
             return;
         }
 
-        const loopItems = [...items, ...items, ...items];
-        lightboxImages = designsCache.map(i => i.image_url).filter(Boolean);
-        grid.innerHTML = `
+        const repeated = [...items, ...items, ...items];
+
+        container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
                     <div class="carousel-track">
-                        ${loopItems.map(item => `
-                            <div class="carousel-card">
-                                <div class="carousel-image" onclick="openDesignLightbox('${escapeAttr(item.image_url || '')}')"
-                                    ${item.image_url
-                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🖌️</div>`}
-                                    ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${repeated.map(buildDesignCard).join('')}
                     </div>
                 </div>
-            </div>`;
+            </div>
+        `;
 
         initCenterCarousels();
     } catch (error) {
         console.error('Failed to load designs:', error);
-        grid.innerHTML = `
+        container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">⚠️</div>
                 <p>Failed to load designs.</p>
-            </div>`;
+            </div>
+        `;
     }
 }
-
 // ==========================================
 // BLOG
 // ==========================================
@@ -832,6 +864,15 @@ function initNavbarScrollEffect() {
 ========================================== */
 let lightboxImages = [];
 let lightboxIndex = 0;
+
+let lightboxScale = 1;
+let lightboxTranslateX = 0;
+let lightboxTranslateY = 0;
+
+let lightboxStartDistance = 0;
+let lightboxStartScale = 1;
+let lightboxPanStartX = 0;
+let lightboxPanStartY = 0;
 let lightboxTouchStartX = 0;
 let lightboxTouchEndX = 0;
 
@@ -839,6 +880,27 @@ function updateLightboxImage() {
     const img = document.getElementById('lightboxImg');
     if (!img || !lightboxImages.length) return;
     img.src = lightboxImages[lightboxIndex] || '';
+    resetLightboxTransform();
+}
+
+function applyLightboxTransform() {
+    const img = document.getElementById('lightboxImg');
+    if (!img) return;
+
+    img.style.transform = `translate(${lightboxTranslateX}px, ${lightboxTranslateY}px) scale(${lightboxScale})`;
+}
+
+function resetLightboxTransform() {
+    lightboxScale = 1;
+    lightboxTranslateX = 0;
+    lightboxTranslateY = 0;
+    applyLightboxTransform();
+}
+
+function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
 }
 
 function openLightbox(src, images = []) {
@@ -871,10 +933,14 @@ function closeLightbox() {
     const img = document.getElementById('lightboxImg');
 
     if (lightbox) lightbox.classList.remove('active');
-    if (img) img.src = '';
+    if (img) {
+        img.src = '';
+        img.style.transform = '';
+    }
 
     lightboxImages = [];
     lightboxIndex = 0;
+    resetLightboxTransform();
 
     document.body.classList.remove('modal-open');
 }
@@ -892,39 +958,61 @@ function showPrevLightboxImage() {
 }
 
 function openGalleryLightbox(src) {
-    const images = (galleryCache || [])
-        .map(item => item.image_url || '')
-        .filter(Boolean);
-
+    const images = (galleryCache || []).map(item => item.image_url || '').filter(Boolean);
     openLightbox(src, images);
 }
 
 function openDesignLightbox(src) {
-    const images = (designsCache || [])
-        .map(item => item.image_url || '')
-        .filter(Boolean);
-
+    const images = (designsCache || []).map(item => item.image_url || '').filter(Boolean);
     openLightbox(src, images);
 }
 
 function initLightboxSwipe() {
-    const content = document.getElementById('lightboxContent');
-    if (!content || content.dataset.swipeInit === 'true') return;
+    const stage = document.getElementById('lightboxStage');
+    if (!stage || stage.dataset.swipeInit === 'true') return;
 
-    content.dataset.swipeInit = 'true';
+    stage.dataset.swipeInit = 'true';
 
-    content.addEventListener('touchstart', (e) => {
-        if (!e.touches[0]) return;
-        lightboxTouchStartX = e.touches[0].clientX;
-        lightboxTouchEndX = e.touches[0].clientX;
+    stage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            lightboxStartDistance = getTouchDistance(e.touches);
+            lightboxStartScale = lightboxScale;
+            return;
+        }
+
+        if (e.touches.length === 1) {
+            lightboxTouchStartX = e.touches[0].clientX;
+            lightboxTouchEndX = e.touches[0].clientX;
+            lightboxPanStartX = e.touches[0].clientX - lightboxTranslateX;
+            lightboxPanStartY = e.touches[0].clientY - lightboxTranslateY;
+        }
     }, { passive: true });
 
-    content.addEventListener('touchmove', (e) => {
-        if (!e.touches[0]) return;
-        lightboxTouchEndX = e.touches[0].clientX;
-    }, { passive: true });
+    stage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            const newDistance = getTouchDistance(e.touches);
+            if (!lightboxStartDistance) return;
 
-    content.addEventListener('touchend', () => {
+            lightboxScale = Math.min(4, Math.max(1, (newDistance / lightboxStartDistance) * lightboxStartScale));
+            applyLightboxTransform();
+            return;
+        }
+
+        if (e.touches.length === 1) {
+            lightboxTouchEndX = e.touches[0].clientX;
+
+            if (lightboxScale > 1) {
+                lightboxTranslateX = e.touches[0].clientX - lightboxPanStartX;
+                lightboxTranslateY = e.touches[0].clientY - lightboxPanStartY;
+                applyLightboxTransform();
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+
+    stage.addEventListener('touchend', () => {
+        if (lightboxScale > 1) return;
+
         const delta = lightboxTouchStartX - lightboxTouchEndX;
         if (Math.abs(delta) < 40) return;
 
@@ -932,6 +1020,15 @@ function initLightboxSwipe() {
             showNextLightboxImage();
         } else {
             showPrevLightboxImage();
+        }
+    });
+
+    stage.addEventListener('dblclick', () => {
+        if (lightboxScale > 1) {
+            resetLightboxTransform();
+        } else {
+            lightboxScale = 2;
+            applyLightboxTransform();
         }
     });
 }
@@ -1164,3 +1261,5 @@ window.showNextLightboxImage = showNextLightboxImage;
 window.showPrevLightboxImage = showPrevLightboxImage;
 window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 window.initLightboxSwipe = initLightboxSwipe;
+window.openGalleryLightbox = openGalleryLightbox;
+window.openDesignLightbox = openDesignLightbox;

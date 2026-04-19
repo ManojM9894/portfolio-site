@@ -347,7 +347,7 @@ async function renderGallery() {
         }
 
         const loopItems = [...items, ...items, ...items];
-        lightboxImages = items.map(i => i.image_url).filter(Boolean);
+        lightboxImages = galleryCache.map(i => i.image_url).filter(Boolean);
         grid.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -399,7 +399,7 @@ async function renderDesigns() {
         }
 
         const loopItems = [...items, ...items, ...items];
-        lightboxImages = items.map(i => i.image_url).filter(Boolean);
+        lightboxImages = designsCache.map(i => i.image_url).filter(Boolean);
         grid.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -1135,6 +1135,15 @@ function initContactForm() {
             btn.disabled  = false;
         }
     });
+}
+function initLightbox() {
+    initLightboxSwipe();
+    const blogModal = document.getElementById('blogReaderModal');
+    if (blogModal) {
+        blogModal.addEventListener('click', (e) => {
+            if (e.target === blogModal) closeBlogReader();
+        });
+    }
 }
 document.addEventListener('DOMContentLoaded', async () => {
     initNavbarScrollEffect();

@@ -2126,3 +2126,87 @@ body {
         letter-spacing: 0.06em !important;
     }
 }
+/* =========================================================
+   FINAL MOBILE BLOG POPUP FIX
+========================================================= */
+@media (max-width: 768px) {
+
+    /* blog modal = 1 column only */
+    .collection-modal-content.blog-collection-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+        padding: 0.85rem !important;
+    }
+
+    /* each blog card */
+    .collection-modal-content.blog-collection-grid .collection-blog-card {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.65rem !important;
+        min-height: auto !important;
+        padding: 0.9rem !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-meta {
+        display: block !important;
+        font-size: 0.64rem !important;
+        line-height: 1.45 !important;
+        letter-spacing: 0.08em !important;
+        color: rgba(255,255,255,0.42) !important;
+        text-transform: uppercase !important;
+        word-break: break-word !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-title {
+        display: block !important;
+        font-size: 0.95rem !important;
+        line-height: 1.32 !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        word-break: break-word !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-excerpt {
+        display: block !important;
+        font-size: 0.78rem !important;
+        line-height: 1.5 !important;
+        color: rgba(255,255,255,0.56) !important;
+        word-break: break-word !important;
+    }
+
+    /* STACK buttons vertically to stop overlap */
+    .collection-modal-content.blog-collection-grid .collection-blog-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        margin-top: 0.1rem !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-btn,
+    .collection-modal-content.blog-collection-grid a.collection-blog-btn,
+    .collection-modal-content.blog-collection-grid button.collection-blog-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        min-height: 40px !important;
+        padding: 0.7rem 0.8rem !important;
+        border-radius: 12px !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        box-sizing: border-box !important;
+        position: static !important;
+        float: none !important;
+        margin: 0 !important;
+    }
+}

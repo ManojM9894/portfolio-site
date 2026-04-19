@@ -33,6 +33,8 @@ let blogCache    = [];
 let galleryCache = [];
 let designsCache = [];
 let profileCache = null;
+let lightboxImages = [];
+let lightboxIndex  = 0;
 
 // ==========================================
 // DATA FETCHING
@@ -345,7 +347,7 @@ async function renderGallery() {
         }
 
         const loopItems = [...items, ...items, ...items];
-
+        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         grid.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -397,7 +399,7 @@ async function renderDesigns() {
         }
 
         const loopItems = [...items, ...items, ...items];
-
+        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         grid.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -827,150 +829,164 @@ function initNavbarScrollEffect() {
 }
 // Light BOX
 
-function openLightbox(src, allImages) {
+// Global lightbox state
+let lightboxImages = [];
+let lightboxIndex  = 0;
+
+function openLightbox(src) {
     if (!src) return;
     const lightbox = document.getElementById('lightbox');
     const img      = document.getElementById('lightboxImg');
     if (!lightbox || !img) return;
 
-    // Build image list for swiping
-    const images = allImages || [src];
-    let currentIndex = images.indexOf(src);
-    if (currentIndex === -1) currentIndex = 0;
+    lightboxIndex = lightboxImages.indexOf(src);
+    if (lightboxIndex === -1) { lightboxImages = [src]; lightboxIndex = 0; }
 
-    img.src = images[currentIndex];
+    img.src = src;
     img.style.transform = 'scale(1)';
-    img.style.transformOrigin = 'center center';
+    img.style.transition = '';
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
-
-    // Zoom state
-    let scale = 1, lastScale = 1, startDist = 0;
-    let posX = 0, posY = 0, startX = 0, startY = 0;
-    let lastPosX = 0, lastPosY = 0;
-    let isDragging = false;
-    let swipeStartX = 0, swipeStartY = 0, isSwiping = false;
-
-    function getDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    function applyTransform() {
-        img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-    }
-
-    function goTo(index) {
-        if (index < 0 || index >= images.length) return;
-        currentIndex = index;
-        img.style.opacity = '0';
-        img.style.transition = 'opacity 0.2s ease';
-        setTimeout(() => {
-            img.src = images[currentIndex];
-            scale = 1; posX = 0; posY = 0;
-            lastPosX = 0; lastPosY = 0;
-            applyTransform();
-            img.style.opacity = '1';
-        }, 200);
-    }
-
-    // Touch handler
-    const handleTouchStart = (e) => {
-        if (e.touches.length === 2) {
-            startDist = getDistance(e.touches);
-            lastScale = scale;
-        } else if (e.touches.length === 1) {
-            swipeStartX = e.touches[0].clientX;
-            swipeStartY = e.touches[0].clientY;
-            if (scale > 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - lastPosX;
-                startY = e.touches[0].clientY - lastPosY;
-            } else {
-                isSwiping = true;
-            }
-        }
-    };
-
-    const handleTouchMove = (e) => {
-        e.preventDefault();
-        if (e.touches.length === 2) {
-            const dist = getDistance(e.touches);
-            scale = Math.min(Math.max(lastScale * (dist / startDist), 1), 4);
-            applyTransform();
-        } else if (e.touches.length === 1) {
-            if (isDragging && scale > 1) {
-                posX = e.touches[0].clientX - startX;
-                posY = e.touches[0].clientY - startY;
-                lastPosX = posX; lastPosY = posY;
-                applyTransform();
-            }
-        }
-    };
-
-    const handleTouchEnd = (e) => {
-        isDragging = false;
-        if (isSwiping && scale <= 1) {
-            const dx = (e.changedTouches[0]?.clientX || swipeStartX) - swipeStartX;
-            const dy = Math.abs((e.changedTouches[0]?.clientY || swipeStartY) - swipeStartY);
-            if (Math.abs(dx) > 50 && dy < 80) {
-                if (dx < 0) goTo(currentIndex + 1);
-                else goTo(currentIndex - 1);
-            }
-        }
-        isSwiping = false;
-        if (scale <= 1) {
-            scale = 1; posX = 0; posY = 0;
-            lastPosX = 0; lastPosY = 0;
-            applyTransform();
-        }
-    };
-
-    // Double tap zoom
-    let lastTap = 0;
-    const handleDoubleTap = (e) => {
-        const now = Date.now();
-        if (now - lastTap < 300) {
-            scale = scale > 1 ? 1 : 2.5;
-            posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
-            applyTransform();
-        }
-        lastTap = now;
-    };
-
-    img.removeEventListener('touchstart', img._ts);
-    img.removeEventListener('touchmove', img._tm);
-    img.removeEventListener('touchend', img._te);
-    img._ts = handleTouchStart;
-    img._tm = handleTouchMove;
-    img._te = handleTouchEnd;
-    img.addEventListener('touchstart', handleTouchStart, { passive: false });
-    img.addEventListener('touchmove', handleTouchMove, { passive: false });
-    img.addEventListener('touchend', handleTouchEnd);
-    img.addEventListener('touchend', handleDoubleTap);
-
-    // Keyboard navigation
-    const handleKey = (e) => {
-        if (e.key === 'ArrowRight') goTo(currentIndex + 1);
-        if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
-        if (e.key === 'Escape')     closeLightbox();
-    };
-    document.removeEventListener('keydown', window._lightboxKey);
-    window._lightboxKey = handleKey;
-    document.addEventListener('keydown', handleKey);
 }
+
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
     const img      = document.getElementById('lightboxImg');
     if (lightbox) lightbox.classList.remove('active');
-    if (img) {
-        img.style.transform = 'scale(1)';
-        img.src = '';
-    }
+    if (img) { img.style.transform = 'scale(1)'; img.src = ''; }
     document.body.style.overflow = '';
 }
 
+function initLightboxSwipe() {
+    const lightbox = document.getElementById('lightbox');
+    const img      = document.getElementById('lightboxImg');
+    if (!lightbox || !img) return;
+
+    let scale = 1, lastScale = 1, startDist = 0;
+    let posX = 0, posY = 0, lastPosX = 0, lastPosY = 0;
+    let touchStartX = 0, touchStartY = 0;
+    let isPinching = false, isDragging = false;
+    let lastTap = 0;
+    let mouseStartX = 0, isMouseDown = false;
+
+    function dist(t) {
+        return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    }
+
+    function applyTransform() {
+        img.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`;
+    }
+
+    function goTo(idx) {
+        if (!lightboxImages.length) return;
+        if (idx < 0) idx = lightboxImages.length - 1;
+        if (idx >= lightboxImages.length) idx = 0;
+        lightboxIndex = idx;
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.18s ease';
+        setTimeout(() => {
+            img.src = lightboxImages[lightboxIndex];
+            scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
+            applyTransform();
+            img.style.opacity = '1';
+        }, 180);
+    }
+
+    // ---- TOUCH ----
+    lightbox.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            isPinching = true;
+            startDist  = dist(e.touches);
+            lastScale  = scale;
+        } else {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isDragging  = scale > 1;
+        }
+    }, { passive: true });
+
+    lightbox.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && isPinching) {
+            e.preventDefault();
+            scale = Math.min(Math.max(lastScale * dist(e.touches) / startDist, 1), 4);
+            applyTransform();
+        } else if (e.touches.length === 1 && isDragging) {
+            e.preventDefault();
+            posX = lastPosX + e.touches[0].clientX - touchStartX;
+            posY = lastPosY + e.touches[0].clientY - touchStartY;
+            applyTransform();
+        }
+    }, { passive: false });
+
+    lightbox.addEventListener('touchend', (e) => {
+        isPinching = false;
+        if (isDragging) {
+            lastPosX = posX; lastPosY = posY;
+            isDragging = false;
+            return;
+        }
+        // Swipe when not zoomed
+        if (scale <= 1) {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+            if (Math.abs(dx) > 55 && dy < 100) {
+                dx < 0 ? goTo(lightboxIndex + 1) : goTo(lightboxIndex - 1);
+                return;
+            }
+        }
+        // Double tap
+        const now = Date.now();
+        if (now - lastTap < 280) {
+            if (scale > 1) {
+                scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
+            } else {
+                scale = 2.5;
+            }
+            applyTransform();
+        }
+        lastTap = now;
+        if (scale <= 1) {
+            scale = 1; posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
+            applyTransform();
+        }
+    });
+
+    // ---- MOUSE (desktop swipe) ----
+    lightbox.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.lightbox-close')) return;
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+        lightbox.style.cursor = 'grabbing';
+    });
+
+    lightbox.addEventListener('mouseup', (e) => {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        lightbox.style.cursor = '';
+        const dx = e.clientX - mouseStartX;
+        if (Math.abs(dx) > 55) {
+            dx < 0 ? goTo(lightboxIndex + 1) : goTo(lightboxIndex - 1);
+        }
+    });
+
+    lightbox.addEventListener('mouseleave', () => {
+        isMouseDown = false;
+        lightbox.style.cursor = '';
+    });
+
+    // ---- CLICK to close backdrop ----
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    // ---- KEYBOARD ----
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        if (e.key === 'ArrowRight') goTo(lightboxIndex + 1);
+        if (e.key === 'ArrowLeft')  goTo(lightboxIndex - 1);
+        if (e.key === 'Escape')     closeLightbox();
+    });
+}
 // ==========================================
 // CONTACT FORM
 // ==========================================

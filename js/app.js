@@ -30,6 +30,7 @@ const platformIcons = {
 };
 
 let blogCache = [];
+let galleryCache =[];
 let designsCache = [];
 let profileCache = null;
 // ==========================================
@@ -311,9 +312,6 @@ function initCenterCarousels() {
 // GALLERY
 // ==========================================
 
-const galleryCache = [];
-const designsCache = [];
-const blogCache = [];
 
 function buildGalleryCard(item) {
     const imageUrl = item?.image_url || '';

@@ -247,7 +247,7 @@ section {
 }
 
 /* ==========================================
-   HERO — INFINITY BG — NO FADE
+ INFINITY BG — NO FADE
 ========================================== */
 #home {
     width: 100%;
@@ -263,7 +263,12 @@ section {
     background-color: #000;
     background-attachment: scroll;
 }
-
+#home {
+    background: linear-gradient(to bottom, 
+        #000 0%, 
+        #000 85%, 
+        transparent 100%);
+}
 
 .hero-content {
     position: relative;
@@ -520,7 +525,19 @@ section {
     line-height: 1.3;
     letter-spacing: 0.02em;
 }
+.carousel-image {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+}
 
+.carousel-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 /* ==========================================
    BLOG CAROUSEL CARD — WITH HOVER GLOW
 ========================================== */
@@ -579,7 +596,7 @@ section {
 .infinite-carousel.is-dragging { cursor: grabbing; }
 
 /* =========================================================
-   FINAL HERO + GITHUB OVERRIDES
+GITHUB
 ========================================================= */
 
 body,
@@ -1488,7 +1505,7 @@ select,
     .hero-name { font-size: clamp(3rem, 14vw, 5rem); }
 }
 /* =========================================================
-   FINAL MOBILE + VIEW ALL MODAL 
+MOBILE + VIEW ALL MODAL 
 ========================================================= */
 
 /* body lock when modal opens */
@@ -1650,6 +1667,47 @@ body.modal-open {
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     cursor: pointer !important;
+}
+@media (max-width: 768px) {
+
+  /* FORCE 2 COLUMN */
+  .collection-modal-content,
+  .blog-collection-grid,
+  .ios-notes-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      padding: 12px !important;
+  }
+
+  /* BLOG NOTE STYLE */
+  .ios-note-card {
+      border-radius: 14px;
+      min-height: 80px;
+  }
+
+  .ios-note-title {
+      font-size: 13px;
+      line-height: 1.4;
+  }
+
+  /* IMAGE GRID SQUARE */
+  .collection-grid-card {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 12px;
+  }
+
+  .collection-grid-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  /* REMOVE TEXT UNDER IMAGES */
+  .collection-grid-info {
+      display: none;
+  }
 }
 
 /* fix contact form mobile typo */
@@ -1863,7 +1921,7 @@ nav.nav-glass.nav-scrolled .admin-menu-btn {
         -webkit-backdrop-filter: blur(18px) saturate(130%) !important;
         box-shadow: 0 14px 36px rgba(0,0,0,0.3) !important;
     }
-    /* =========================================================
+/* =========================================================
    FINAL MOBILE TWEAKS
 ========================================================= */
 
@@ -2039,7 +2097,7 @@ body {
 }
 }
 /* =========================================================
-   FINAL MOBILE POPUP GRID FIX
+MOBILE POPUP GRID
 ========================================================= */
 @media (max-width: 768px) {
     /* BLOG = single column */
@@ -2120,7 +2178,7 @@ body {
     }
 }
 /* =========================================================
-   FINAL MOBILE BLOG POPUP FIX
+MOBILE BLOG POPUP FIX
 ========================================================= */
 @media (max-width: 768px) {
 
@@ -2353,4 +2411,92 @@ body {
 
     .lightbox-prev { left: 8px; }
     .lightbox-next { right: 8px; }
+}
+/* =========================================================
+   GALLERY / DESIGN / LIGHTBOX FIX
+========================================================= */
+
+/* home preview image reliability */
+.carousel-image img,
+.recent-work-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* swipe / pinch zoom */
+.lightbox-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#lightboxImg {
+    max-width: 100%;
+    max-height: calc(100vh - 80px);
+    border-radius: 10px;
+    display: block;
+    transform-origin: center center;
+    transition: transform 0.08s linear;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* mobile titles for gallery/design popup */
+@media (max-width: 768px) {
+    .collection-modal-content:not(.blog-collection-grid) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.65rem !important;
+        padding: 0.8rem !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-card {
+        position: relative !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        background: #111 !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-card img {
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        height: auto !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 0.55rem 0.65rem 0.6rem !important;
+        background: linear-gradient(to top, rgba(0,0,0,0.82), transparent) !important;
+        color: #fff !important;
+        font-size: 0.7rem !important;
+        line-height: 1.3 !important;
+        z-index: 2 !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info strong {
+        color: #fff !important;
+        display: block !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        line-height: 1.25 !important;
+        word-break: break-word !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info div {
+        display: none !important;
+    }
 }

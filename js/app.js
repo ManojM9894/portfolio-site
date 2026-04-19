@@ -169,7 +169,7 @@ function initCenterCarousels() {
         let touchLastX = 0;
         let touchLastTime = 0;
 
-       wrap.style.touchAction = 'pan-y pinch-zoom';
+       wrap.style.touchAction = 'pan-y';
 
 wrap.addEventListener('touchstart', (e) => {
     if (!e.touches[0]) return;
@@ -192,17 +192,6 @@ wrap.addEventListener('touchend', (e) => {
     const dx = (e.changedTouches[0]?.clientX || startX) - startX;
     addImpulse(-(dx * 0.04));
 });
-wrap.addEventListener('touchmove', (e) => {
-    if (!isDragging || !e.touches[0]) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = Math.abs(e.touches[0].clientY - (e.touches[0].clientY || 0));
-    // Only prevent default if horizontal swipe
-    if (Math.abs(dx) > 10) {
-        e.preventDefault();
-    }
-    position = dragStartPosition + dx;
-    render();
-}, { passive: false });
 
         function applyDockEffect() {
             const wrapRect = wrap.getBoundingClientRect();
@@ -299,15 +288,12 @@ wrap.addEventListener('touchmove', (e) => {
             { passive: true }
         );
 
-        wrap.addEventListener(
-            'touchmove',
-            (e) => {
-                if (!isDragging || !e.touches[0]) return;
-                position = dragStartPosition + (e.touches[0].clientX - startX);
-                render();
-            },
-            { passive: true }
-        );
+      wrap.addEventListener('touchmove', (e) => {
+    if (!isDragging || !e.touches[0]) return;
+    const dx = e.touches[0].clientX - startX;
+    position = dragStartPosition + dx;
+    render();
+    }, { passive: true });
 
         wrap.addEventListener('touchend', () => {
             isDragging = false;
@@ -648,7 +634,9 @@ function renderCollectionModalContent(type) {
 
     content.innerHTML = visibleItems.length
         ? visibleItems.map(item => `
-            <div class="collection-blog-card ios-note-card">
+            <div class="ios-note-title">
+    ${escapeHtml(item.title || 'Untitled')}
+</div>
                 <button class="ios-note-button" onclick="openBlogReaderFromCollection(${item.id})">
                     <span class="ios-note-title">${escapeHtml(item.title || 'Untitled')}</span>
                 </button>
@@ -958,12 +946,11 @@ function showPrevLightboxImage() {
 }
 
 function openGalleryLightbox(src) {
-    const images = (galleryCache || []).map(item => item.image_url || '').filter(Boolean);
+    const images = galleryCache.map(i => i.image_url).filter(Boolean);
     openLightbox(src, images);
 }
-
 function openDesignLightbox(src) {
-    const images = (designsCache || []).map(item => item.image_url || '').filter(Boolean);
+    const images = designsCache.map(i => i.image_url).filter(Boolean);
     openLightbox(src, images);
 }
 

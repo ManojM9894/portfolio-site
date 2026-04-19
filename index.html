@@ -26,32 +26,32 @@
     opacity: 0.4;
     mix-blend-mode: screen;"></div>
     <!-- NAVBAR -->
-   <nav>
-    <a href="#home" class="nav-logo">MM</a>
+    <nav>
+        <a href="#home" class="nav-logo">MM</a>
 
-    <ul class="nav-links">
-        <li><a href="#home" class="active">Home</a></li>
-        <li><a href="#gallery">Art Gallery</a></li>
-        <li><a href="#designs">Designs</a></li>
-        <li><a href="#blog">Blog</a></li>
-        <li><a href="#github">GitHub</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <ul class="nav-links">
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#gallery">Art Gallery</a></li>
+            <li><a href="#designs">Designs</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#github">GitHub</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
 
-        <li class="admin-menu">
-            <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="Admin controls">⋯</button>
-            <div class="admin-dropdown" id="adminDropdown">
-                <a href="./admin.html" target="_blank" rel="noopener noreferrer" class="admin-dropdown-link">
-                    Admin Panel
-                </a>
-            </div>
-        </li>
-    </ul>
+            <li class="admin-menu">
+                <button type="button" class="admin-menu-btn" id="adminMenuBtn" aria-label="Admin controls">⋯</button>
+                <div class="admin-dropdown" id="adminDropdown">
+                    <a href="./admin.html" target="_blank" rel="noopener noreferrer" class="admin-dropdown-link">
+                        Admin Panel
+                    </a>
+                </div>
+            </li>
+        </ul>
 
-    <div class="hamburger"><span></span><span></span><span></span></div>
-</nav>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </nav>
 
-     <!-- HERO -->
+    <!-- HERO -->
     <section id="home">
         <div class="hero-content">
             <div class="hero-greeting">WELCOME TO MY PORTFOLIO</div>
@@ -130,8 +130,7 @@
         <div id="blogList"></div>
     </section>
 
-    <!-- BLOG READER -->
-    <!-- BLOG READER SECTION (hidden) -->
+    <!-- BLOG READER SECTION -->
     <section id="blogReader" style="display:none;visibility:hidden;height:0;overflow:hidden;padding:0;margin:0;">
     </section>
 
@@ -223,7 +222,6 @@
         </div>
     </section>
 
-    <!-- CONTACT -->
     <!-- CONTACT -->
     <section id="contact">
         <div class="contact-grid premium-contact-grid">
@@ -321,35 +319,38 @@
     </section>
 
     <!-- COLLECTION MODAL -->
-   <div class="collection-modal" id="collectionModal">
-    <div class="collection-modal-backdrop" onclick="closeCollectionModal()"></div>
+    <div class="collection-modal" id="collectionModal">
+        <div class="collection-modal-backdrop" onclick="closeCollectionModal()"></div>
 
-    <div class="collection-modal-panel">
-        <div class="collection-modal-header">
-            <h3 id="collectionModalTitle">All Items</h3>
-            <button type="button" class="collection-close" onclick="closeCollectionModal()">✕</button>
+        <div class="collection-modal-panel">
+            <div class="collection-modal-header">
+                <h3 id="collectionModalTitle">All Items</h3>
+                <button type="button" class="collection-close" onclick="closeCollectionModal()">✕</button>
+            </div>
+
+            <div id="collectionModalContent" class="collection-modal-content"></div>
         </div>
-
-        <div id="collectionModalContent" class="collection-modal-content"></div>
     </div>
-</div>
 
-    <!-- LIGHTBOX -->
     <div class="lightbox" id="lightbox">
-        <div class="lightbox-content">
-            <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div class="lightbox-content" id="lightboxContent">
+        <button class="lightbox-nav lightbox-prev" onclick="showPrevLightboxImage()">‹</button>
+        <div class="lightbox-stage" id="lightboxStage">
             <img id="lightboxImg" src="" alt="Preview" />
         </div>
+        <button class="lightbox-nav lightbox-next" onclick="showNextLightboxImage()">›</button>
+        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     </div>
+</div>
 
     <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/supabase-config.js"></script>
-<script src="./js/github.js"></script>
-<script src="./js/app.js"></script>
+    <script src="./js/supabase-config.js"></script>
+    <script src="./js/github.js"></script>
+    <script src="./js/app.js"></script>
 </body>
 
 </html>

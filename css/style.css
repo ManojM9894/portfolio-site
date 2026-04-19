@@ -1051,30 +1051,36 @@ select,
     display: block;
     transition: opacity 0.18s ease;
 }
-.lightbox-close {
+/* .lightbox-close {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 18px;
+    right: 18px;
 
-    padding: 8px 12px;
-    border-radius: 999px;
+    width: 34px;
+    height: 34px;
 
-    background: rgba(20,20,20,0.6);
-    backdrop-filter: blur(14px);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
 
-    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     color: #fff;
-    font-size: 14px;
+    font-size: 18px;
     cursor: pointer;
 
     transition: all 0.25s ease;
 }
 
 .lightbox-close:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.05);
 }
-
+.lightbox-close:active {
+    transform: scale(0.92);
+} */
 /* .lightbox-close {
     position: fixed;
     top: 16px;
@@ -2520,4 +2526,76 @@ MOBILE BLOG POPUP FIX
 .lightbox-prev,
 .lightbox-next {
     display: none !important;
+}
+/* swipe-down lightbox polish */
+.lightbox {
+    transition: background 0.22s ease;
+}
+
+.lightbox-stage {
+    transition: transform 0.22s ease;
+    will-change: transform;
+}
+/* swipe-down lightbox polish */
+.lightbox {
+    transition: background 0.22s ease;
+}
+
+.lightbox-stage {
+    transition: transform 0.22s ease;
+    will-change: transform;
+}
+/* Desktop: show arrows */
+.lightbox-prev,
+.lightbox-next {
+    display: flex;
+}
+
+/* Mobile: hide arrows, keep swipe */
+@media (max-width: 768px) {
+    .lightbox-prev,
+    .lightbox-next {
+        display: none !important;
+    }
+}
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(12,12,12,0.72);
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(20,20,20,0.9);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.lightbox-prev:active,
+.lightbox-next:active {
+    transform: translateY(-50%) scale(0.96);
+}
+
+.lightbox-prev { left: -54px; }
+.lightbox-next { right: -54px; }
+
+@media (max-width: 768px) {
+    .lightbox-prev,
+    .lightbox-next {
+        display: none !important;
+    }
 }

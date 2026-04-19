@@ -167,10 +167,56 @@ function initCenterCarousels() {
         let isDragging = false;
         let startX = 0;
         let dragStartPosition = 0;
+        let touchLastX = 0;
+        let touchLastTime = 0;
 
-        wrap.style.overflow = 'hidden';
-        track.style.willChange = 'transform';
-        track.style.transform = 'translate3d(0,0,0)';
+       wrap.style.touchAction = 'pan-y pinch-zoom';
+
+wrap.addEventListener('touchstart', (e) => {
+    if (!e.touches[0]) return;
+
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    dragStartPosition = position;
+
+    touchLastX = startX;
+    touchLastTime = performance.now();
+
+    wrap.classList.add('is-dragging');
+}, { passive: true });
+
+wrap.addEventListener('touchmove', (e) => {
+    if (!isDragging || !e.touches[0]) return;
+
+    const x = e.touches[0].clientX;
+    const dxFromStart = x - startX;
+
+    position = dragStartPosition + dxFromStart;
+
+    const now = performance.now();
+    const dx = x - touchLastX;
+    const dt = Math.max(now - touchLastTime, 16);
+
+    velocity = -(dx / dt) * 7;
+
+    touchLastX = x;
+    touchLastTime = now;
+
+    render();
+
+    if (Math.abs(dxFromStart) > 6) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+wrap.addEventListener('touchend', () => {
+    isDragging = false;
+    wrap.classList.remove('is-dragging');
+
+    if (Math.abs(velocity) < 0.45) {
+        velocity = velocity < 0 ? -0.45 : 0.45;
+    }
+});
 
         function applyDockEffect() {
             const wrapRect = wrap.getBoundingClientRect();

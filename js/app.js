@@ -351,7 +351,7 @@ async function renderGallery() {
                     <div class="carousel-track">
                         ${loopItems.map(item => `
                             <div class="carousel-card">
-                                <div class="carousel-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
+                                <div class="carousel-image" onclick="openGalleryLightbox('${escapeAttr(item.image_url || '')}')"
                                     ${item.image_url
                                         ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
                                         : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🎨</div>`}
@@ -403,7 +403,7 @@ async function renderDesigns() {
                     <div class="carousel-track">
                         ${loopItems.map(item => `
                             <div class="carousel-card">
-                                <div class="carousel-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
+                                <div class="carousel-image" onclick="openDesignLightbox('${escapeAttr(item.image_url || '')}')"
                                     ${item.image_url
                                         ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
                                         : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🖌️</div>`}
@@ -571,7 +571,7 @@ function renderCollectionModalContent(type) {
                             loading="lazy"
                             src="${escapeAttr(item.image_url)}"
                             alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}', ${JSON.stringify(galleryCache.map(i => i.image_url || ''))})"
+                            onclick="openGalleryLightbox('${escapeAttr(item.image_url)}')"
                             style="opacity:0;transition:opacity 0.25s ease"
                             onload="this.style.opacity='1'"
                         >
@@ -596,7 +596,7 @@ function renderCollectionModalContent(type) {
                             loading="lazy"
                             src="${escapeAttr(item.image_url)}"
                             alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}', ${JSON.stringify(designsCache.map(i => i.image_url || ''))})"
+                            onclick="openDesignLightbox('${escapeAttr(item.image_url)}')"
                             style="opacity:0;transition:opacity 0.25s ease"
                             onload="this.style.opacity='1'"
                         >
@@ -953,10 +953,118 @@ function showToast(msg) {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3500);
 }
+/* ==========================================
+   LIGHTBOX
+========================================== */
+let lightboxImages = [];
+let lightboxIndex = 0;
+let lightboxTouchStartX = 0;
+let lightboxTouchEndX = 0;
 
-// ==========================================
-// INIT
-// ==========================================
+function updateLightboxImage() {
+    const img = document.getElementById('lightboxImg');
+    if (!img || !lightboxImages.length) return;
+    img.src = lightboxImages[lightboxIndex] || '';
+}
+
+function openLightbox(src, images = []) {
+    if (!src) return;
+
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+
+    if (!lightbox || !img) return;
+
+    lightboxImages = Array.isArray(images) && images.length
+        ? images.filter(Boolean)
+        : [src];
+
+    lightboxIndex = lightboxImages.indexOf(src);
+    if (lightboxIndex < 0) {
+        lightboxIndex = 0;
+        if (!lightboxImages.length) {
+            lightboxImages = [src];
+        }
+    }
+
+    updateLightboxImage();
+    lightbox.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+
+    if (lightbox) lightbox.classList.remove('active');
+    if (img) img.src = '';
+
+    lightboxImages = [];
+    lightboxIndex = 0;
+
+    document.body.classList.remove('modal-open');
+}
+
+function showNextLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function showPrevLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function openGalleryLightbox(src) {
+    const images = (galleryCache || [])
+        .map(item => item.image_url || '')
+        .filter(Boolean);
+
+    openLightbox(src, images);
+}
+
+function openDesignLightbox(src) {
+    const images = (designsCache || [])
+        .map(item => item.image_url || '')
+        .filter(Boolean);
+
+    openLightbox(src, images);
+}
+
+function initLightboxSwipe() {
+    const content = document.getElementById('lightboxContent');
+    if (!content || content.dataset.swipeInit === 'true') return;
+
+    content.dataset.swipeInit = 'true';
+
+    content.addEventListener('touchstart', (e) => {
+        if (!e.touches[0]) return;
+        lightboxTouchStartX = e.touches[0].clientX;
+        lightboxTouchEndX = e.touches[0].clientX;
+    }, { passive: true });
+
+    content.addEventListener('touchmove', (e) => {
+        if (!e.touches[0]) return;
+        lightboxTouchEndX = e.touches[0].clientX;
+    }, { passive: true });
+
+    content.addEventListener('touchend', () => {
+        const delta = lightboxTouchStartX - lightboxTouchEndX;
+        if (Math.abs(delta) < 40) return;
+
+        if (delta > 0) {
+            showNextLightboxImage();
+        } else {
+            showPrevLightboxImage();
+        }
+    });
+}
+
+function initLightbox() {
+    initLightboxSwipe();
+}
 
 // ==========================================
 // NAVIGATION
@@ -1106,9 +1214,6 @@ async function submitContactMessage(event) {
 }
 
 // ==========================================
-// GLOBALS FOR INLINE HTML
-// ==========================================
-// ==========================================
 // GLOBALS
 // ==========================================
 window.openLightbox            = openLightbox;
@@ -1123,3 +1228,4 @@ window.closeLightbox = closeLightbox;
 window.showNextLightboxImage = showNextLightboxImage;
 window.showPrevLightboxImage = showPrevLightboxImage;
 window.openBlogReaderFromCollection = openBlogReaderFromCollection;
+window.initLightboxSwipe = initLightboxSwipe;

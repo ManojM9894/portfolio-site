@@ -828,11 +828,6 @@ function initNavbarScrollEffect() {
     updateNav();
 }
 // Light BOX
-
-// Global lightbox state
-let lightboxImages = [];
-let lightboxIndex  = 0;
-
 function openLightbox(src) {
     if (!src) return;
     const lightbox = document.getElementById('lightbox');

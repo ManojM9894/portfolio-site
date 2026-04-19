@@ -263,12 +263,7 @@ section {
     background-color: #000;
     background-attachment: scroll;
 }
-#home {
-    background: linear-gradient(to bottom, 
-        #000 0%, 
-        #000 85%, 
-        transparent 100%);
-}
+
 
 .hero-content {
     position: relative;
@@ -490,7 +485,6 @@ section {
     border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow);
     cursor: pointer;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -498,7 +492,6 @@ section {
 .carousel-image:hover,
 .recent-work-image:hover {
     border-color: rgba(255,255,255,0.15);
-    box-shadow: 0 0 20px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5);
 }
 
 .carousel-image img,
@@ -1058,8 +1051,31 @@ select,
     display: block;
     transition: opacity 0.18s ease;
 }
-
 .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    padding: 8px 12px;
+    border-radius: 999px;
+
+    background: rgba(20,20,20,0.6);
+    backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* .lightbox-close {
     position: fixed;
     top: 16px;
     right: 16px;
@@ -1084,7 +1100,7 @@ select,
     background: rgba(255,255,255,0.2);
     border-color: #fff;
     transform: scale(1.1);
-}
+} */
 
 /* ==========================================
    VIEW ALL MODAL — FINAL CLEAN FIX
@@ -2499,4 +2515,9 @@ MOBILE BLOG POPUP FIX
     .collection-modal-content:not(.blog-collection-grid) .collection-grid-info div {
         display: none !important;
     }
+}
+/* REMOVE ARROWS */
+.lightbox-prev,
+.lightbox-next {
+    display: none !important;
 }

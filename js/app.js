@@ -953,27 +953,45 @@ function openDesignLightbox(src) {
 
 function initLightboxSwipe() {
     const stage = document.getElementById('lightboxStage');
-    if (!stage || stage.dataset.swipeInit === 'true') return;
+    const lightbox = document.getElementById('lightbox');
 
+    if (!stage || !lightbox || stage.dataset.swipeInit === 'true') return;
     stage.dataset.swipeInit = 'true';
+
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let isPinching = false;
+    let isDraggingDown = false;
 
     stage.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
+            isPinching = true;
             lightboxStartDistance = getTouchDistance(e.touches);
             lightboxStartScale = lightboxScale;
             return;
         }
 
         if (e.touches.length === 1) {
-            lightboxTouchStartX = e.touches[0].clientX;
-            lightboxTouchEndX = e.touches[0].clientX;
-            lightboxPanStartX = e.touches[0].clientX - lightboxTranslateX;
-            lightboxPanStartY = e.touches[0].clientY - lightboxTranslateY;
+            isPinching = false;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            currentX = startX;
+            currentY = startY;
+
+            lightboxTouchStartX = startX;
+            lightboxTouchEndX = startX;
+
+            lightboxPanStartX = startX - lightboxTranslateX;
+            lightboxPanStartY = startY - lightboxTranslateY;
+            isDraggingDown = false;
         }
     }, { passive: true });
 
     stage.addEventListener('touchmove', (e) => {
         if (e.touches.length === 2) {
+            isPinching = true;
             const newDistance = getTouchDistance(e.touches);
             if (!lightboxStartDistance) return;
 
@@ -982,29 +1000,75 @@ function initLightboxSwipe() {
             return;
         }
 
-        if (e.touches.length === 1) {
-            lightboxTouchEndX = e.touches[0].clientX;
+        if (e.touches.length !== 1) return;
 
-            if (lightboxScale > 1) {
-                lightboxTranslateX = e.touches[0].clientX - lightboxPanStartX;
-                lightboxTranslateY = e.touches[0].clientY - lightboxPanStartY;
-                applyLightboxTransform();
-                e.preventDefault();
-            }
+        currentX = e.touches[0].clientX;
+        currentY = e.touches[0].clientY;
+        lightboxTouchEndX = currentX;
+
+        const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
+
+        if (lightboxScale > 1) {
+            lightboxTranslateX = currentX - lightboxPanStartX;
+            lightboxTranslateY = currentY - lightboxPanStartY;
+            applyLightboxTransform();
+            e.preventDefault();
+            return;
+        }
+
+        if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 0) {
+            isDraggingDown = true;
+
+            const dragAmount = Math.max(0, deltaY);
+            const progress = Math.min(dragAmount / 220, 1);
+
+            stage.style.transform = `translateY(${dragAmount}px) scale(${1 - progress * 0.08})`;
+            lightbox.style.background = `rgba(0,0,0,${0.95 - progress * 0.45})`;
+
+            e.preventDefault();
         }
     }, { passive: false });
 
     stage.addEventListener('touchend', () => {
-        if (lightboxScale > 1) return;
-
-        const delta = lightboxTouchStartX - lightboxTouchEndX;
-        if (Math.abs(delta) < 40) return;
-
-        if (delta > 0) {
-            showNextLightboxImage();
-        } else {
-            showPrevLightboxImage();
+        if (isPinching) {
+            isPinching = false;
+            return;
         }
+
+        const deltaX = lightboxTouchStartX - lightboxTouchEndX;
+        const deltaY = currentY - startY;
+
+        if (lightboxScale > 1) {
+            return;
+        }
+
+        if (isDraggingDown) {
+            if (deltaY > 120) {
+                stage.style.transform = '';
+                lightbox.style.background = '';
+                closeLightbox();
+                return;
+            } else {
+                stage.style.transition = 'transform 0.22s ease';
+                lightbox.style.transition = 'background 0.22s ease';
+                stage.style.transform = '';
+                lightbox.style.background = '';
+
+                setTimeout(() => {
+                    stage.style.transition = '';
+                    lightbox.style.transition = '';
+                }, 220);
+            }
+        } else if (Math.abs(deltaX) > 40) {
+            if (deltaX > 0) {
+                showNextLightboxImage();
+            } else {
+                showPrevLightboxImage();
+            }
+        }
+
+        isDraggingDown = false;
     });
 
     stage.addEventListener('dblclick', () => {

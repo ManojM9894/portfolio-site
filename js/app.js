@@ -902,6 +902,95 @@ function showToast(msg) {
 // INIT
 // ==========================================
 
+// ==========================================
+// NAVIGATION
+// ==========================================
+
+function initNav() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu   = document.querySelector('.nav-links');
+    const navLinks  = document.querySelectorAll('.nav-links a');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => navMenu?.classList.remove('open'));
+    });
+
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('section[id]');
+        let current = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+        });
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+    });
+}
+
+function initAdminMenu() {
+    const btn      = document.getElementById('adminMenuBtn');
+    const dropdown = document.getElementById('adminDropdown');
+    const openBtn  = document.getElementById('openAdminBtn');
+
+    if (btn && dropdown) {
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => dropdown.classList.remove('open'));
+    }
+    if (openBtn) {
+        openBtn.addEventListener('click', () =>
+            window.open('https://manojm9894.github.io/portfolio-site/admin.html', '_blank', 'noopener,noreferrer'));
+    }
+}
+
+function initModals() {
+    document.getElementById('lightbox')?.addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeLightbox();
+    });
+    document.getElementById('blogReaderModal')?.addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeBlogReader();
+    });
+}
+
+function initContactForm() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn  = form.querySelector('button[type="submit"]');
+        const orig = btn.innerHTML;
+        btn.innerHTML = 'Sending... ⏳';
+        btn.disabled  = true;
+        const inputs  = form.querySelectorAll('input, textarea');
+        const name    = inputs[0]?.value.trim() || '';
+        const email   = inputs[1]?.value.trim() || '';
+        const subject = inputs[2]?.value.trim() || '';
+        const message = inputs[3]?.value.trim() || '';
+        if (!name || !email || !message) {
+            showToast('⚠️ Please fill in all required fields.');
+            btn.innerHTML = orig;
+            btn.disabled  = false;
+            return;
+        }
+        try {
+            const { error } = await supabaseClient.from('messages').insert([{ name, email, subject, message }]);
+            if (error) throw error;
+            showToast('✅ Message sent!');
+            form.reset();
+        } catch(err) {
+            showToast('❌ Failed to send. Please email directly.');
+        } finally {
+            btn.innerHTML = orig;
+            btn.disabled  = false;
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', async () => {
     initNavbarScrollEffect();
     try {

@@ -1250,7 +1250,7 @@ select,
 /* ==========================================
    RESPONSIVE
 ========================================== */
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
     section { padding: 60px 40px 20px; }
     .recent-works-section .section-header-row { padding: 0 40px; }
 }
@@ -1375,7 +1375,7 @@ select,
     .collection-modal-content {
         grid-template-columns: 1fr !important;
     }
-}
+} */
 /* ==========================================
    BLOG READER MODAL
 ========================================== */
@@ -1476,4 +1476,258 @@ select,
     .contact-form-grid    { grid-column: 1fr; }
 
     .hero-name { font-size: clamp(3rem, 14vw, 5rem); }
+}
+/* =========================================================
+   FINAL MOBILE + VIEW ALL MODAL 
+========================================================= */
+
+/* body lock when modal opens */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* reduce gap between Writing Blog and GitHub */
+#blog {
+    padding-bottom: 8px !important;
+}
+
+#github {
+    padding-top: 24px !important;
+}
+
+#blog .carousel-shell,
+#github .carousel-shell {
+    padding-top: 10px !important;
+    padding-bottom: 6px !important;
+}
+
+/* make modal open as centered flex instead of block */
+.collection-modal.open {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* stable modal sizing */
+.collection-modal-panel {
+    width: min(1180px, calc(100% - 24px)) !important;
+    height: min(88vh, 920px) !important;
+    max-height: 88vh !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* make the content area the real scroll container */
+.collection-modal-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    padding: 1rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1rem !important;
+    align-content: start !important;
+}
+
+/* desktop blog modal cards */
+.blog-collection-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+}
+
+.collection-blog-card {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 14px !important;
+    padding: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+    min-height: 220px !important;
+}
+
+.collection-blog-meta {
+    font-size: 0.7rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: rgba(255,255,255,0.45) !important;
+    line-height: 1.5 !important;
+}
+
+.collection-blog-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #fff !important;
+}
+
+.collection-blog-excerpt {
+    font-size: 0.84rem !important;
+    line-height: 1.6 !important;
+    color: rgba(255,255,255,0.56) !important;
+    flex: 1 !important;
+}
+
+.collection-blog-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem !important;
+}
+
+.collection-blog-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 38px !important;
+    padding: 0.65rem 0.95rem !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    transition: all 0.2s ease !important;
+}
+
+.collection-blog-btn:hover {
+    border-color: rgba(255,255,255,0.18) !important;
+    color: var(--accent) !important;
+}
+
+/* improve design/gallery cards inside modal */
+.collection-grid-card {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.collection-grid-card img {
+    width: 100% !important;
+    height: 190px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.collection-grid-info {
+    padding: 0.8rem 0.9rem 0.95rem !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.82rem !important;
+    line-height: 1.5 !important;
+}
+
+/* load more button if present */
+.collection-load-more-wrap {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding-top: 0.5rem !important;
+}
+
+.collection-load-more-btn {
+    min-width: 170px !important;
+    padding: 0.8rem 1rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+    background: rgba(255,255,255,0.04) !important;
+    color: #fff !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+}
+
+/* fix contact form mobile typo */
+@media (max-width: 768px) {
+    section {
+        padding: 68px 16px 18px !important;
+    }
+
+    .recent-works-section .section-header-row {
+        padding: 0 16px !important;
+    }
+
+    .premium-contact-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .contact-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* modal full usable height on mobile */
+    .collection-modal-panel {
+        width: calc(100% - 12px) !important;
+        height: calc(100vh - 12px) !important;
+        max-height: calc(100vh - 12px) !important;
+        border-radius: 14px !important;
+    }
+
+    .collection-modal-header {
+        padding: 0.9rem 1rem !important;
+    }
+
+    /* 2 items per row on mobile for all 3 sections */
+    .collection-modal-content,
+    .blog-collection-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+        padding: 0.85rem !important;
+    }
+
+    .collection-grid-card img {
+        height: 110px !important;
+    }
+
+    .collection-grid-info {
+        padding: 0.65rem 0.7rem 0.8rem !important;
+        font-size: 0.74rem !important;
+    }
+
+    .collection-blog-card {
+        min-height: 0 !important;
+        padding: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .collection-blog-meta {
+        font-size: 0.58rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .collection-blog-title {
+        font-size: 0.84rem !important;
+        line-height: 1.3 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .collection-blog-excerpt {
+        font-size: 0.72rem !important;
+        line-height: 1.45 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 4 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .collection-blog-actions {
+        flex-direction: column !important;
+        gap: 0.45rem !important;
+    }
+
+    .collection-blog-btn {
+        width: 100% !important;
+        min-height: 34px !important;
+        font-size: 0.68rem !important;
+        padding: 0.55rem 0.6rem !important;
+    }
 }

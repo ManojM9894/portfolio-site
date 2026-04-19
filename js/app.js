@@ -613,6 +613,7 @@ function renderCollectionModalContent(type) {
 
     else if (type === 'blog') {
         title.textContent = 'All Blog Posts';
+        content.className = 'collection-modal-content blog-collection-grid';
 
         content.innerHTML = visibleItems.length
             ? visibleItems.map(item => `
@@ -825,49 +826,104 @@ function initNavbarScrollEffect() {
     updateNav();
 }
 
-// ==========================================
-// LIGHTBOX + MODAL INIT
-// ==========================================
-// ==========================================
-// LIGHTBOX
-// ==========================================
-
 function openLightbox(src) {
     if (!src) return;
     const lightbox = document.getElementById('lightbox');
     const img      = document.getElementById('lightboxImg');
     if (!lightbox || !img) return;
+
     img.src = src;
+    img.style.transform = 'scale(1)';
+    img.style.transformOrigin = 'center center';
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
-}
 
+    // Pinch zoom variables
+    let scale = 1;
+    let lastScale = 1;
+    let startDist = 0;
+    let posX = 0, posY = 0;
+    let startX = 0, startY = 0;
+    let lastPosX = 0, lastPosY = 0;
+    let isDragging = false;
+
+    function getDistance(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function applyTransform() {
+        img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    }
+
+    // Pinch zoom
+    img.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            startDist = getDistance(e.touches);
+            lastScale = scale;
+        } else if (e.touches.length === 1 && scale > 1) {
+            isDragging = true;
+            startX = e.touches[0].clientX - lastPosX;
+            startY = e.touches[0].clientY - lastPosY;
+        }
+    }, { passive: true });
+
+    img.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 2) {
+            const dist = getDistance(e.touches);
+            scale = Math.min(Math.max(lastScale * (dist / startDist), 1), 4);
+            applyTransform();
+        } else if (e.touches.length === 1 && isDragging && scale > 1) {
+            posX = e.touches[0].clientX - startX;
+            posY = e.touches[0].clientY - startY;
+            lastPosX = posX;
+            lastPosY = posY;
+            applyTransform();
+        }
+    }, { passive: false });
+
+    img.addEventListener('touchend', () => {
+        isDragging = false;
+        if (scale <= 1) {
+            scale = 1;
+            posX = 0;
+            posY = 0;
+            lastPosX = 0;
+            lastPosY = 0;
+            applyTransform();
+        }
+    });
+
+    // Double tap to zoom
+    let lastTap = 0;
+    img.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            if (scale > 1) {
+                scale = 1;
+                posX = 0;
+                posY = 0;
+                lastPosX = 0;
+                lastPosY = 0;
+            } else {
+                scale = 2.5;
+            }
+            applyTransform();
+        }
+        lastTap = now;
+    });
+}
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
+    const img      = document.getElementById('lightboxImg');
     if (lightbox) lightbox.classList.remove('active');
+    if (img) {
+        img.style.transform = 'scale(1)';
+        img.src = '';
+    }
     document.body.style.overflow = '';
-}
-
-function initLightbox() {
-    const lightboxEl = document.getElementById('lightbox');
-    if (lightboxEl) {
-        lightboxEl.addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeLightbox();
-        });
-    }
-
-    const blogModal = document.getElementById('blogReaderModal');
-    if (blogModal) {
-        blogModal.addEventListener('click', (e) => {
-            if (e.target === blogModal) closeBlogReader();
-        });
-    }
-
-    const collectionModal = document.getElementById('collectionModal');
-    if (collectionModal) {
-        collectionModal.querySelector('.collection-modal-backdrop')
-            ?.addEventListener('click', closeCollectionModal);
-    }
 }
 
 // ==========================================

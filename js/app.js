@@ -550,107 +550,92 @@ function renderRecentWorks() {
 // ==========================================
 // COLLECTION MODAL
 // ==========================================
+// ==========================================
+// COLLECTION MODAL
+// ==========================================
 const collectionRenderState = {
     type: '',
     limit: 20
 };
 
-function getCollectionItems(type) {
-    if (type === 'gallery') return galleryCache || [];
-    if (type === 'designs') return designsCache || [];
-    if (type === 'blog') return blogCache || [];
-    return [];
+let collectionTouchStartY = 0;
+let collectionTouchEndY = 0;
+
+function initCollectionModalSwipe() {
+    const panel = document.querySelector('.collection-modal-panel');
+    if (!panel || panel.dataset.swipeInit === 'true') return;
+
+    panel.dataset.swipeInit = 'true';
+
+    panel.ontouchstart = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchStartY = e.touches[0].clientY;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
+
+    panel.ontouchmove = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
+
+    panel.ontouchend = () => {
+        const deltaY = collectionTouchEndY - collectionTouchStartY;
+        if (deltaY > 80) {
+            closeCollectionModal();
+        }
+    };
 }
 
-function renderCollectionModalContent(type) {
+function openCollectionModal(type) {
+    const modal = document.getElementById('collectionModal');
     const title = document.getElementById('collectionModalTitle');
     const content = document.getElementById('collectionModalContent');
-    if (!title || !content) return;
 
-    const allItems = getCollectionItems(type);
-    const visibleItems = allItems.slice(0, collectionRenderState.limit);
-
-    content.className = 'collection-modal-content';
-    if (type === 'blog') {
-        content.classList.add('blog-collection-grid');
+    if (!modal || !title || !content) {
+        console.error('Collection modal elements not found');
+        return;
     }
 
-    if (type === 'gallery') {
-        title.textContent = 'All Artworks';
+    collectionRenderState.type = type;
+    collectionRenderState.limit = 20;
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
-                <div class="collection-grid-card">
-                    ${item.image_url ? `
-                        <img
-                            loading="lazy"
-                            src="${escapeAttr(item.image_url)}"
-                            alt="${escapeHtml(item.title || '')}"
-                            onclick="openGalleryLightbox('${escapeAttr(item.image_url)}')"
-                            style="opacity:0;transition:opacity 0.25s ease"
-                            onload="this.style.opacity='1'"
-                        >
-                    ` : ''}
-                    <div class="collection-grid-info">
-                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.4rem">${escapeHtml(item.description)}</div>` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
+    renderCollectionModalContent(type);
+    initCollectionModalSwipe();
+
+    modal.classList.add('open');
+    document.body.classList.add('modal-open');
+
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = 'none';
+    });
+}
+
+function loadMoreCollectionItems() {
+    if (!collectionRenderState.type) return;
+    collectionRenderState.limit += 20;
+    renderCollectionModalContent(collectionRenderState.type);
+}
+
+function closeCollectionModal() {
+    const modal = document.getElementById('collectionModal');
+    const content = document.getElementById('collectionModalContent');
+
+    if (modal) modal.classList.remove('open');
+
+    if (content) {
+        content.innerHTML = '';
+        content.scrollTop = 0;
+        content.className = 'collection-modal-content';
     }
 
-    else if (type === 'designs') {
-        title.textContent = 'All Designs';
+    collectionRenderState.type = '';
+    collectionRenderState.limit = 20;
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
-                <div class="collection-grid-card">
-                    ${item.image_url ? `
-                        <img
-                            loading="lazy"
-                            src="${escapeAttr(item.image_url)}"
-                            alt="${escapeHtml(item.title || '')}"
-                            onclick="openDesignLightbox('${escapeAttr(item.image_url)}')"
-                            style="opacity:0;transition:opacity 0.25s ease"
-                            onload="this.style.opacity='1'"
-                        >
-                    ` : ''}
-                    <div class="collection-grid-info">
-                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.4rem">${escapeHtml(item.description)}</div>` : ''}
-                    </div>
-                </div>
-            `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
-    }
+    document.body.classList.remove('modal-open');
 
-    else if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid ios-notes-grid';
-
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
-            <div class="ios-note-title">
-    ${escapeHtml(item.title || 'Untitled')}
-</div>
-                <button class="ios-note-button" onclick="openBlogReaderFromCollection(${item.id})">
-                    <span class="ios-note-title">${escapeHtml(item.title || 'Untitled')}</span>
-                </button>
-            </div>
-        `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
-    }
-
-    if (allItems.length > collectionRenderState.limit) {
-        content.innerHTML += `
-            <div class="collection-load-more-wrap">
-                <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
-                    Load More
-                </button>
-            </div>
-        `;
-    }
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = '';
+    });
 }
 // ==========================================
 // BLOG READER
@@ -724,26 +709,6 @@ function loadMoreCollectionItems() {
     if (!collectionRenderState.type) return;
     collectionRenderState.limit += 20;
     renderCollectionModalContent(collectionRenderState.type);
-}
-const panel = document.querySelector('.collection-modal-panel');
-if (panel) {
-    panel.ontouchstart = (e) => {
-        if (!e.touches[0]) return;
-        collectionTouchStartY = e.touches[0].clientY;
-        collectionTouchEndY = e.touches[0].clientY;
-    };
-
-    panel.ontouchmove = (e) => {
-        if (!e.touches[0]) return;
-        collectionTouchEndY = e.touches[0].clientY;
-    };
-
-    panel.ontouchend = () => {
-        const deltaY = collectionTouchEndY - collectionTouchStartY;
-        if (deltaY > 80) {
-            closeCollectionModal();
-        }
-    };
 }
 function closeCollectionModal() {
     const modal = document.getElementById('collectionModal');

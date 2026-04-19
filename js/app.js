@@ -137,6 +137,158 @@ async function renderAbout() {
         console.error('Failed to load profile:', error);
     }
 }
+/* ==========================================
+   CAROUSEL
+========================================== */
+function initCenterCarousels() {
+    const wraps = document.querySelectorAll('.center-carousel');
+
+    wraps.forEach((wrap) => {
+        if (wrap.dataset.carouselInit === 'true') return;
+        wrap.dataset.carouselInit = 'true';
+
+        const track = wrap.querySelector('.carousel-track, .recent-works-track');
+        if (!track) return;
+
+        const cards = [...track.children];
+        if (!cards.length) return;
+
+        const originalCount = Number(
+            wrap.dataset.originalCount || Math.floor(cards.length / 3) || cards.length
+        );
+
+        const gap = parseFloat(getComputedStyle(track).gap || '0');
+        const firstCard = cards[0];
+        const unitWidth = firstCard.offsetWidth + gap;
+        const setWidth = unitWidth * originalCount;
+
+        let position = 0;
+        let velocity = 0.45;
+        let isDragging = false;
+        let startX = 0;
+        let dragStartPosition = 0;
+
+        wrap.style.overflow = 'hidden';
+        track.style.willChange = 'transform';
+        track.style.transform = 'translate3d(0,0,0)';
+
+        function applyDockEffect() {
+            const wrapRect = wrap.getBoundingClientRect();
+            const centerX = wrapRect.left + wrapRect.width / 2;
+            const visibleCards = track.querySelectorAll(
+                '.carousel-card, .blog-carousel-card, .recent-work-card'
+            );
+
+            visibleCards.forEach((card) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.left + rect.width / 2;
+                const dist = Math.abs(centerX - cardCenter);
+                const maxDist = wrapRect.width * 0.5;
+                const ratio = Math.min(dist / maxDist, 1);
+
+                const scale = 1.06 - ratio * 0.24;
+                const lift = (1 - ratio) * 8;
+                const opacity = 1 - ratio * 0.35;
+
+                card.style.transform = `translateY(${-lift}px) scale(${scale})`;
+                card.style.opacity = `${opacity}`;
+                card.classList.toggle('is-active', ratio < 0.16);
+            });
+        }
+
+        function normalizeLoop() {
+            while (position <= -setWidth) position += setWidth;
+            while (position > 0) position -= setWidth;
+        }
+
+        function render() {
+            normalizeLoop();
+            track.style.transform = `translate3d(${position}px, 0, 0)`;
+            applyDockEffect();
+        }
+
+        function animate() {
+            if (!isDragging) {
+                position -= velocity;
+                velocity *= 0.985;
+                if (Math.abs(velocity) < 0.45) velocity = 0.45;
+            }
+            render();
+            requestAnimationFrame(animate);
+        }
+
+        function addImpulse(delta) {
+            velocity += delta;
+            if (velocity > 18) velocity = 18;
+            if (velocity < -18) velocity = -18;
+        }
+
+        wrap.addEventListener(
+            'wheel',
+            (e) => {
+                e.preventDefault();
+                const delta = e.deltaY || e.deltaX;
+                position -= delta * 0.9;
+                addImpulse(delta * 0.015);
+                render();
+            },
+            { passive: false }
+        );
+
+        wrap.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            dragStartPosition = position;
+            wrap.classList.add('is-dragging');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            position = dragStartPosition + (e.clientX - startX);
+            render();
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            isDragging = false;
+            wrap.classList.remove('is-dragging');
+            addImpulse(-(dx * 0.02));
+        });
+
+        wrap.addEventListener(
+            'touchstart',
+            (e) => {
+                if (!e.touches[0]) return;
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                dragStartPosition = position;
+            },
+            { passive: true }
+        );
+
+        wrap.addEventListener(
+            'touchmove',
+            (e) => {
+                if (!isDragging || !e.touches[0]) return;
+                position = dragStartPosition + (e.touches[0].clientX - startX);
+                render();
+            },
+            { passive: true }
+        );
+
+        wrap.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        window.addEventListener('resize', () => {
+            render();
+        });
+
+        render();
+        requestAnimationFrame(animate);
+    });
+}
 
 // ==========================================
 // GALLERY
@@ -553,40 +705,47 @@ function initAdminMenu() {
         });
     }
 }
+/* ==========================================
+   APPLE-STYLE FLOATING GLASS NAV
+========================================== */
+function initNavbarScrollEffect() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
 
-// ==========================================
-// NAVIGATION
-// ==========================================
+    nav.classList.add('nav-glass', 'nav-fade-in');
 
-function initNav() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu   = document.querySelector('.nav-links');
-    const navLinks  = document.querySelectorAll('.nav-links a');
+    let ticking = false;
+    let lastY = window.scrollY;
 
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-        });
+    function updateNav() {
+        const y = window.scrollY;
+
+        if (y > 24) {
+            nav.classList.add('nav-scrolled');
+        } else {
+            nav.classList.remove('nav-scrolled');
+        }
+
+        if (y > lastY && y > 80) {
+            nav.classList.add('nav-fade-out');
+            nav.classList.remove('nav-fade-in');
+        } else {
+            nav.classList.add('nav-fade-in');
+            nav.classList.remove('nav-fade-out');
+        }
+
+        lastY = y;
+        ticking = false;
     }
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navMenu) navMenu.classList.remove('open');
-        });
-    });
-
     window.addEventListener('scroll', () => {
-        const sections = document.querySelectorAll('section[id]');
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 120;
-            if (window.scrollY >= sectionTop) current = section.getAttribute('id');
-        });
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current) link.classList.add('active');
-        });
-    });
+        if (!ticking) {
+            window.requestAnimationFrame(updateNav);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    updateNav();
 }
 
 // ==========================================
@@ -681,6 +840,7 @@ function showToast(msg) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initNavbarScrollEffect();
     try {
         await renderGallery();
         await renderDesigns();
@@ -740,3 +900,4 @@ window.closeCollectionModal = closeCollectionModal;
 window.loadMoreCollectionItems = loadMoreCollectionItems;
 window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
+window.initCenterCarousels = initCenterCarousels;

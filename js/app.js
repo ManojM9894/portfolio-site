@@ -751,6 +751,25 @@ function initNavbarScrollEffect() {
 // ==========================================
 // LIGHTBOX + MODAL INIT
 // ==========================================
+// ==========================================
+// LIGHTBOX
+// ==========================================
+
+function openLightbox(src) {
+    if (!src) return;
+    const lightbox = document.getElementById('lightbox');
+    const img      = document.getElementById('lightboxImg');
+    if (!lightbox || !img) return;
+    img.src = src;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
 
 function initLightbox() {
     const lightboxEl = document.getElementById('lightbox');
@@ -891,13 +910,14 @@ async function submitContactMessage(event) {
 // ==========================================
 // GLOBALS FOR INLINE HTML
 // ==========================================
-
-window.openCollectionModal  = openCollectionModal;
-window.closeCollectionModal = closeCollectionModal;
-window.submitContactMessage = submitContactMessage;
-window.openCollectionModal = openCollectionModal;
-window.closeCollectionModal = closeCollectionModal;
-window.loadMoreCollectionItems = loadMoreCollectionItems;
-window.openBlogReaderFromCollection = openBlogReaderFromCollection;
+// ==========================================
+// GLOBALS
+// ==========================================
+window.openLightbox            = openLightbox;
+window.closeLightbox           = closeLightbox;
+window.openBlogReader          = openBlogReader;
+window.closeBlogReader         = closeBlogReader;
+window.openCollectionModal     = openCollectionModal;
+window.closeCollectionModal    = closeCollectionModal;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
-window.initCenterCarousels = initCenterCarousels;
+window.submitContactMessage    = submitContactMessage;

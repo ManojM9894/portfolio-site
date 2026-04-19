@@ -359,8 +359,9 @@ function openCollectionModal(type) {
     content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading...</p></div>';
 
     // Render after short delay so modal opens first
-    setTimeout(() => {
-        if (type === 'gallery') {
+   setTimeout(() => {
+    content.style.gridTemplateColumns = ''; // reset to CSS default
+    if (type === 'gallery') {
             title.textContent = 'All Artworks';
             if (!galleryCache.length) {
                 content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
@@ -398,42 +399,36 @@ function openCollectionModal(type) {
                     </div>
                 </div>`).join('');
 
-        } else if (type === 'blog') {
-            title.textContent = 'All Blog Posts';
-            if (!blogCache.length) {
-                content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No posts yet.</p></div>`;
-                return;
-            }
-            content.innerHTML = blogCache.map(item => `
-                <div class="collection-grid-card"
-                     style="padding:1.2rem;cursor:pointer;display:flex;flex-direction:column;gap:0.5rem;"
-                     onclick="openBlogReaderFromModal(${item.id})">
-                    <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">
-                        ${platformIcons[item.platform] || '✍️'}
-                        ${escapeHtml(item.category || '')}
-                        ${item.post_date ? '· ' + escapeHtml(item.post_date) : ''}
-                        ${item.platform  ? '· ' + escapeHtml(item.platform)  : ''}
-                    </div>
-                    <div style="font-size:1rem;font-weight:600;color:#fff;line-height:1.3;">
-                        ${escapeHtml(item.title || 'Untitled')}
-                    </div>
-                    ${item.excerpt
-                        ? `<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;flex:1;">${escapeHtml(item.excerpt)}</div>`
-                        : ''}
-                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
-                        ${item.content
-                            ? `<span style="font-size:0.75rem;color:var(--accent);font-weight:600;">Read Post →</span>`
-                            : ''}
-                        ${item.url
-                            ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener"
-                                  onclick="event.stopPropagation()"
-                                  style="font-size:0.75rem;color:#60a5fa;font-weight:500;text-decoration:none;">
-                                  Open Link ↗
-                               </a>`
-                            : ''}
-                    </div>
-                </div>`).join('');
-        }
+       } else if (type === 'blog') {
+    title.textContent = 'All Blog Posts';
+    if (!blogCache.length) {
+        content.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No posts yet.</p></div>`;
+        return;
+    }
+    // Use single column for blog
+    content.style.gridTemplateColumns = '1fr';
+    content.innerHTML = blogCache.map(item => `
+        <div class="collection-grid-card"
+             style="padding:1.2rem;cursor:pointer;flex-direction:column;gap:0.5rem;"
+             onclick="openBlogReaderFromModal(${item.id})">
+            <div style="font-size:0.72rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">
+                ${platformIcons[item.platform] || '✍️'}
+                ${escapeHtml(item.category || '')}
+                ${item.post_date ? '· ' + escapeHtml(item.post_date) : ''}
+                ${item.platform  ? '· ' + escapeHtml(item.platform)  : ''}
+            </div>
+            <div style="font-size:1rem;font-weight:600;color:#fff;line-height:1.3;margin-bottom:0.4rem;">
+                ${escapeHtml(item.title || 'Untitled')}
+            </div>
+            ${item.excerpt
+                ? `<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;">${escapeHtml(item.excerpt)}</div>`
+                : ''}
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">
+                ${item.content ? `<span style="font-size:0.75rem;color:var(--accent);font-weight:600;">Read Post →</span>` : ''}
+                ${item.url ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:0.75rem;color:#60a5fa;font-weight:500;text-decoration:none;">Open Link ↗</a>` : ''}
+            </div>
+        </div>`).join('');
+}
     }, 50);
 }
 // ==========================================

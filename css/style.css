@@ -1040,24 +1040,31 @@ select,
 }
 
 .lightbox-close {
-    position: absolute;
-    top: -14px;
-    right: -14px;
-    width: 40px;
-    height: 40px;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    border: 1px solid var(--border);
-    background: #111;
-    color: var(--text-secondary);
+    border: 2px solid rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.8);
+    color: #fff;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    z-index: 10001;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-.lightbox-close:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.lightbox-close:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: #fff;
+    transform: scale(1.1);
+}
 
 /* ==========================================
    VIEW ALL MODAL — FINAL CLEAN FIX

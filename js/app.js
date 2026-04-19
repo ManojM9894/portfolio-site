@@ -572,7 +572,7 @@ function renderCollectionModalContent(type) {
                             loading="lazy"
                             src="${escapeAttr(item.image_url)}"
                             alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                            onclick="openLightbox('${escapeAttr(item.image_url)}', ${JSON.stringify(galleryCache.map(i => i.image_url || ''))})"
                             style="opacity:0;transition:opacity 0.25s ease"
                             onload="this.style.opacity='1'"
                         >
@@ -597,7 +597,7 @@ function renderCollectionModalContent(type) {
                             loading="lazy"
                             src="${escapeAttr(item.image_url)}"
                             alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                            onclick="openLightbox('${escapeAttr(item.image_url)}', ${JSON.stringify(designsCache.map(i => i.image_url || ''))})"
                             style="opacity:0;transition:opacity 0.25s ease"
                             onload="this.style.opacity='1'"
                         >
@@ -825,27 +825,31 @@ function initNavbarScrollEffect() {
 
     updateNav();
 }
+// Light BOX
 
-function openLightbox(src) {
+function openLightbox(src, allImages) {
     if (!src) return;
     const lightbox = document.getElementById('lightbox');
     const img      = document.getElementById('lightboxImg');
     if (!lightbox || !img) return;
 
-    img.src = src;
+    // Build image list for swiping
+    const images = allImages || [src];
+    let currentIndex = images.indexOf(src);
+    if (currentIndex === -1) currentIndex = 0;
+
+    img.src = images[currentIndex];
     img.style.transform = 'scale(1)';
     img.style.transformOrigin = 'center center';
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Pinch zoom variables
-    let scale = 1;
-    let lastScale = 1;
-    let startDist = 0;
-    let posX = 0, posY = 0;
-    let startX = 0, startY = 0;
+    // Zoom state
+    let scale = 1, lastScale = 1, startDist = 0;
+    let posX = 0, posY = 0, startX = 0, startY = 0;
     let lastPosX = 0, lastPosY = 0;
     let isDragging = false;
+    let swipeStartX = 0, swipeStartY = 0, isSwiping = false;
 
     function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
@@ -857,63 +861,104 @@ function openLightbox(src) {
         img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     }
 
-    // Pinch zoom
-    img.addEventListener('touchstart', (e) => {
+    function goTo(index) {
+        if (index < 0 || index >= images.length) return;
+        currentIndex = index;
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.2s ease';
+        setTimeout(() => {
+            img.src = images[currentIndex];
+            scale = 1; posX = 0; posY = 0;
+            lastPosX = 0; lastPosY = 0;
+            applyTransform();
+            img.style.opacity = '1';
+        }, 200);
+    }
+
+    // Touch handler
+    const handleTouchStart = (e) => {
         if (e.touches.length === 2) {
             startDist = getDistance(e.touches);
             lastScale = scale;
-        } else if (e.touches.length === 1 && scale > 1) {
-            isDragging = true;
-            startX = e.touches[0].clientX - lastPosX;
-            startY = e.touches[0].clientY - lastPosY;
+        } else if (e.touches.length === 1) {
+            swipeStartX = e.touches[0].clientX;
+            swipeStartY = e.touches[0].clientY;
+            if (scale > 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - lastPosX;
+                startY = e.touches[0].clientY - lastPosY;
+            } else {
+                isSwiping = true;
+            }
         }
-    }, { passive: true });
+    };
 
-    img.addEventListener('touchmove', (e) => {
+    const handleTouchMove = (e) => {
         e.preventDefault();
         if (e.touches.length === 2) {
             const dist = getDistance(e.touches);
             scale = Math.min(Math.max(lastScale * (dist / startDist), 1), 4);
             applyTransform();
-        } else if (e.touches.length === 1 && isDragging && scale > 1) {
-            posX = e.touches[0].clientX - startX;
-            posY = e.touches[0].clientY - startY;
-            lastPosX = posX;
-            lastPosY = posY;
-            applyTransform();
+        } else if (e.touches.length === 1) {
+            if (isDragging && scale > 1) {
+                posX = e.touches[0].clientX - startX;
+                posY = e.touches[0].clientY - startY;
+                lastPosX = posX; lastPosY = posY;
+                applyTransform();
+            }
         }
-    }, { passive: false });
+    };
 
-    img.addEventListener('touchend', () => {
+    const handleTouchEnd = (e) => {
         isDragging = false;
+        if (isSwiping && scale <= 1) {
+            const dx = (e.changedTouches[0]?.clientX || swipeStartX) - swipeStartX;
+            const dy = Math.abs((e.changedTouches[0]?.clientY || swipeStartY) - swipeStartY);
+            if (Math.abs(dx) > 50 && dy < 80) {
+                if (dx < 0) goTo(currentIndex + 1);
+                else goTo(currentIndex - 1);
+            }
+        }
+        isSwiping = false;
         if (scale <= 1) {
-            scale = 1;
-            posX = 0;
-            posY = 0;
-            lastPosX = 0;
-            lastPosY = 0;
+            scale = 1; posX = 0; posY = 0;
+            lastPosX = 0; lastPosY = 0;
             applyTransform();
         }
-    });
+    };
 
-    // Double tap to zoom
+    // Double tap zoom
     let lastTap = 0;
-    img.addEventListener('touchend', (e) => {
+    const handleDoubleTap = (e) => {
         const now = Date.now();
         if (now - lastTap < 300) {
-            if (scale > 1) {
-                scale = 1;
-                posX = 0;
-                posY = 0;
-                lastPosX = 0;
-                lastPosY = 0;
-            } else {
-                scale = 2.5;
-            }
+            scale = scale > 1 ? 1 : 2.5;
+            posX = 0; posY = 0; lastPosX = 0; lastPosY = 0;
             applyTransform();
         }
         lastTap = now;
-    });
+    };
+
+    img.removeEventListener('touchstart', img._ts);
+    img.removeEventListener('touchmove', img._tm);
+    img.removeEventListener('touchend', img._te);
+    img._ts = handleTouchStart;
+    img._tm = handleTouchMove;
+    img._te = handleTouchEnd;
+    img.addEventListener('touchstart', handleTouchStart, { passive: false });
+    img.addEventListener('touchmove', handleTouchMove, { passive: false });
+    img.addEventListener('touchend', handleTouchEnd);
+    img.addEventListener('touchend', handleDoubleTap);
+
+    // Keyboard navigation
+    const handleKey = (e) => {
+        if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+        if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+        if (e.key === 'Escape')     closeLightbox();
+    };
+    document.removeEventListener('keydown', window._lightboxKey);
+    window._lightboxKey = handleKey;
+    document.addEventListener('keydown', handleKey);
 }
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');

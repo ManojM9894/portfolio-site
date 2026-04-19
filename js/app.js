@@ -347,26 +347,47 @@ function renderRecentWorks() {
     initCenterCarousels();
 }
 
-function openCollectionModal(type) {
-    const modal = document.getElementById('collectionModal');
+const collectionRenderState = {
+    type: '',
+    limit: 20
+};
+
+function getCollectionItems(type) {
+    if (type === 'gallery') return galleryCache || [];
+    if (type === 'designs') return designsCache || [];
+    if (type === 'blog') return blogCache || [];
+    return [];
+}
+
+function renderCollectionModalContent(type) {
     const title = document.getElementById('collectionModalTitle');
     const content = document.getElementById('collectionModalContent');
+    if (!title || !content) return;
 
-    if (!modal || !title || !content) return;
+    const allItems = getCollectionItems(type);
+    const visibleItems = allItems.slice(0, collectionRenderState.limit);
 
     content.className = 'collection-modal-content';
-    content.innerHTML = '';
-    content.scrollTop = 0;
+    if (type === 'blog') {
+        content.classList.add('blog-collection-grid');
+    }
 
     if (type === 'gallery') {
         title.textContent = 'All Artworks';
 
-        content.innerHTML = galleryCache.length
-            ? galleryCache.map(item => `
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
                 <div class="collection-grid-card">
-                    ${item.image_url
-                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
-                        : ''}
+                    ${item.image_url ? `
+                        <img
+                            loading="lazy"
+                            src="${escapeAttr(item.image_url)}"
+                            alt="${escapeHtml(item.title || '')}"
+                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                            style="opacity:0;transition:opacity 0.3s ease"
+                            onload="this.style.opacity='1'"
+                        >
+                    ` : ''}
                     <div class="collection-grid-info">
                         ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
                         ${item.description ? `<div style="margin-top:0.45rem">${escapeHtml(item.description)}</div>` : ''}
@@ -374,16 +395,24 @@ function openCollectionModal(type) {
                 </div>
             `).join('')
             : `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
+    }
 
-    } else if (type === 'designs') {
+    else if (type === 'designs') {
         title.textContent = 'All Designs';
 
-        content.innerHTML = designsCache.length
-            ? designsCache.map(item => `
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
                 <div class="collection-grid-card">
-                    ${item.image_url
-                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
-                        : ''}
+                    ${item.image_url ? `
+                        <img
+                            loading="lazy"
+                            src="${escapeAttr(item.image_url)}"
+                            alt="${escapeHtml(item.title || '')}"
+                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
+                            style="opacity:0;transition:opacity 0.3s ease"
+                            onload="this.style.opacity='1'"
+                        >
+                    ` : ''}
                     <div class="collection-grid-info">
                         ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
                         ${item.description ? `<div style="margin-top:0.45rem">${escapeHtml(item.description)}</div>` : ''}
@@ -391,13 +420,13 @@ function openCollectionModal(type) {
                 </div>
             `).join('')
             : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
+    }
 
-    } else if (type === 'blog') {
+    else if (type === 'blog') {
         title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid';
 
-        content.innerHTML = blogCache.length
-            ? blogCache.map(item => `
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
                 <div class="collection-blog-card">
                     <div class="collection-blog-meta">
                         ${escapeHtml(item.category || 'Blog')}
@@ -421,8 +450,44 @@ function openCollectionModal(type) {
             : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
     }
 
+    if (allItems.length > collectionRenderState.limit) {
+        content.innerHTML += `
+            <div class="collection-load-more-wrap">
+                <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
+                    Load More
+                </button>
+            </div>
+        `;
+    }
+}
+
+function openCollectionModal(type) {
+    const modal = document.getElementById('collectionModal');
+    const title = document.getElementById('collectionModalTitle');
+    const content = document.getElementById('collectionModalContent');
+
+    if (!modal || !title || !content) {
+        console.error('Collection modal elements not found');
+        return;
+    }
+
+    collectionRenderState.type = type;
+    collectionRenderState.limit = 20;
+
+    renderCollectionModalContent(type);
+
     modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = 'none';
+    });
+}
+
+function loadMoreCollectionItems() {
+    if (!collectionRenderState.type) return;
+    collectionRenderState.limit += 20;
+    renderCollectionModalContent(collectionRenderState.type);
 }
 
 function closeCollectionModal() {
@@ -430,12 +495,21 @@ function closeCollectionModal() {
     const content = document.getElementById('collectionModalContent');
 
     if (modal) modal.classList.remove('open');
+
     if (content) {
-        content.scrollTop = 0;
         content.innerHTML = '';
+        content.scrollTop = 0;
+        content.className = 'collection-modal-content';
     }
 
-    document.body.style.overflow = '';
+    collectionRenderState.type = '';
+    collectionRenderState.limit = 20;
+
+    document.body.classList.remove('modal-open');
+
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = '';
+    });
 }
 
 function openBlogReaderFromCollection(id) {
@@ -835,6 +909,12 @@ async function submitContactMessage(event) {
     btn.innerHTML = originalText;
     btn.disabled = false;
 }
+function openBlogReaderFromModal(id) {
+    openBlogReaderFromCollection(id);
+}
+
+window.openBlogReaderFromModal = openBlogReaderFromModal;
+window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 // ==========================================
 // GLOBALS FOR INLINE HTML
 // ==========================================
@@ -845,5 +925,6 @@ window.openBlogReader          = openBlogReader;
 window.closeBlogReader         = closeBlogReader;
 window.openCollectionModal     = openCollectionModal;
 window.closeCollectionModal    = closeCollectionModal;
-window.openBlogReaderFromModal = openBlogReaderFromModal;
+window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 window.submitContactMessage    = submitContactMessage;
+window.loadMoreCollectionItems = loadMoreCollectionItems;

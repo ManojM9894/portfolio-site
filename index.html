@@ -22,9 +22,8 @@
     background-size: 140%;
     background-position: center center;
     background-repeat: repeat;
-    opacity: 0.8;
-    mix-blend-mode: screen;
-"></div>
+    opacity: 0.4;
+    mix-blend-mode: screen;"></div>
     <!-- NAVBAR -->
    <nav>
     <a href="#home" class="nav-logo">MM</a>
@@ -51,32 +50,40 @@
     <div class="hamburger"><span></span><span></span><span></span></div>
 </nav>
 
-    <!-- HERO -->
+     <!-- HERO -->
     <section id="home">
         <div class="hero-content">
-            <div style="position:relative;z-index:1;">
-                <div class="hero-greeting">Welcome to my Portfolio</div>
-                <h1 class="hero-name">
-                    <span id="hero-first-name">Manoj</span>
-                    <span id="hero-last-name">Mandava</span>
-                </h1>
-                <p class="hero-title" id="hero-title">Working Professional · Artist · Writer · Designer · Developer</p>
-                <p class="hero-tagline" id="hero-tagline">Just for fun!!</p>
-                <div class="hero-btns">
-                    <a href="#gallery" class="btn-primary">View My Work</a>
-                    <a href="#contact" class="btn-ghost">Contact Me</a>
-                </div>
-                <div class="recent-works-section">
-                    <div class="section-header-row">
-                        <div>
-                            <h2 class="section-title">Recent <span>Works</span></h2>
-                            <p class="section-subtitle">Latest art, designs, and writing</p>
-                        </div>
-                    </div>
-                    <div id="recentWorksGrid"></div>
-                </div>
-                <div class="hero-scroll">SCROLL</div>
+            <div class="hero-greeting">WELCOME TO MY PORTFOLIO</div>
+
+            <h1 class="hero-name" id="hero-name">
+                <span id="hero-first-name">Manoj</span>
+                <span id="hero-last-name">Mandava</span>
+            </h1>
+
+            <p class="hero-title" id="hero-title">
+                Working Professional · Artist · Designer · Developer
+            </p>
+
+            <p class="hero-tagline" id="hero-tagline">
+                Turning imagination into reality — one canvas, word, and line of code at a time.
+            </p>
+
+            <div class="hero-btns">
+                <a href="#gallery" class="btn-primary">View My Work</a>
+                <a href="#contact" class="btn-ghost">Contact Me</a>
             </div>
+
+            <div class="recent-works-section" id="recent-works-section">
+                <div class="section-header-row">
+                    <div>
+                        <h2 class="section-title">Recent <span>Works</span></h2>
+                        <p class="section-subtitle">Latest art, designs, and writing</p>
+                    </div>
+                </div>
+                <div id="recentWorksGrid"></div>
+            </div>
+
+            <div class="hero-scroll">SCROLL</div>
         </div>
     </section>
 
@@ -90,6 +97,7 @@
             </div>
             <button class="section-view-all" onclick="openCollectionModal('gallery')">View All ↗</button>
         </div>
+
         <div id="galleryGrid"></div>
     </section>
 
@@ -103,22 +111,75 @@
             </div>
             <button class="section-view-all" onclick="openCollectionModal('designs')">View All ↗</button>
         </div>
+
         <div id="designsGrid"></div>
     </section>
 
     <!-- BLOG -->
-    <<!-- BLOG -->
-<section id="blog">
-    <div class="section-header-row">
-        <div>
-            <h2 class="section-title">Writing <span>Blog</span></h2>
-            <p class="section-subtitle">Thoughts, stories, and articles</p>
-            <div class="section-divider"></div>
+    <section id="blog">
+        <div class="section-header-row">
+            <div>
+                <h2 class="section-title">Writing <span>Blog</span></h2>
+                <p class="section-subtitle">Thoughts, stories, and articles</p>
+                <div class="section-divider"></div>
+            </div>
+            <button class="section-view-all" onclick="openCollectionModal('blog')">View All ↗</button>
         </div>
-        <button class="section-view-all" onclick="openCollectionModal('blog')">View All ↗</button>
+
+        <div id="blogList"></div>
+    </section>
+
+    <!-- BLOG READER -->
+    <!-- BLOG READER SECTION (hidden) -->
+    <section id="blogReader" style="display:none;visibility:hidden;height:0;overflow:hidden;padding:0;margin:0;">
+    </section>
+
+    <!-- BLOG READER MODAL (outside hidden section) -->
+    <div id="blogReaderModal"
+        style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);overflow-y:auto;padding:2rem 1rem;">
+        <div
+            style="max-width:780px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;position:relative;">
+
+            <!-- Header -->
+            <div
+                style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;">
+                <div style="display:flex;align-items:center;gap:0.8rem">
+                    <span style="color:var(--accent);font-size:1.2rem">✍️</span>
+                    <span id="readerModalMeta" style="font-size:0.85rem;color:var(--text-secondary)"></span>
+                </div>
+                <button onclick="closeBlogReader()"
+                    style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;"
+                    onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">✕</button>
+            </div>
+
+            <!-- Content -->
+            <div style="padding:2rem 1.5rem;">
+                <h1 id="readerModalTitle"
+                    style="font-size:1.8rem;font-weight:800;margin-bottom:1.5rem;color:var(--text-primary);line-height:1.2">
+                </h1>
+                <div id="readerModalContent" style="color:var(--text-secondary);line-height:1.8;font-size:1rem;"></div>
+                <div id="readerModalExternal"
+                    style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)"></div>
+            </div>
+
+        </div>
     </div>
-    <div id="blogList"></div>
-</section>
+
+    <!-- Modal Content -->
+    <div style="padding:2rem 1.5rem;">
+        <h1 id="readerModalTitle"
+            style="font-size:1.8rem;font-weight:800;margin-bottom:1rem;color:var(--text-primary);line-height:1.2">
+        </h1>
+        <div id="readerModalContent" style="color:var(--text-secondary);line-height:1.8;font-size:1rem;">
+        </div>
+        <div id="readerModalExternal" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+        </div>
+    </div>
+
+    </div>
+    </div>
+    </section>
 
     <!-- GITHUB -->
     <section id="github">
@@ -129,6 +190,7 @@
                 <div class="section-divider"></div>
             </div>
         </div>
+
         <div id="githubCards"></div>
     </section>
 
@@ -141,14 +203,17 @@
                 <div class="section-divider"></div>
             </div>
         </div>
+
         <div class="about-grid">
             <div class="about-image-card">
                 <div id="about-avatar" class="about-avatar">👤</div>
             </div>
+
             <div class="about-content">
                 <h3 id="about-name">Manoj Mandava</h3>
                 <p id="about-bio1"></p>
                 <p id="about-bio2"></p>
+
                 <div class="skills-wrapper">
                     <h4>Skills</h4>
                     <div id="about-skills" class="skills-list"></div>
@@ -158,56 +223,72 @@
     </section>
 
     <!-- CONTACT -->
+    <!-- CONTACT -->
     <section id="contact">
-        <div class="section-header-row">
-            <div>
-                <h2 class="section-title">Get In <span>Touch</span></h2>
-                <p class="section-subtitle">Let's connect and create something together</p>
-                <div class="section-divider"></div>
-            </div>
-        </div>
-        <div class="premium-contact-grid">
-            <div class="premium-contact-card">
+        <div class="contact-grid premium-contact-grid">
+
+            <!-- LEFT: Connect Social Links -->
+            <div class="contact-card premium-contact-card">
                 <div class="contact-card-top">
-                    <div class="contact-icon-badge"><i class="fas fa-share-nodes"></i></div>
+                    <div class="contact-icon-badge">
+                        <i class="fas fa-share-nodes"></i>
+                    </div>
                     <div>
                         <h3>Connect</h3>
-                        <p>Find me across social, writing, and analytics platforms.</p>
+                        <p>Connect through my social, writing, portfolio, and analytics platforms.</p>
                     </div>
                 </div>
-                <div class="premium-social-icons">
-                    <a href="https://www.linkedin.com/in/manojkmandava/" target="_blank" class="social-link linkedin"><i
-                            class="fab fa-linkedin-in"></i><span>LinkedIn</span></a>
-                    <a href="https://github.com/ManojM9894" target="_blank" class="social-link github"><i
-                            class="fab fa-github"></i><span>GitHub</span></a>
-                    <a href="https://substack.com/@manojmandava" target="_blank" class="social-link substack"><i
-                            class="fas fa-newspaper"></i><span>Substack</span></a>
-                    <a href="https://medium.com/@manoj.mandava9" target="_blank" class="social-link medium"><i
-                            class="fab fa-medium-m"></i><span>Medium</span></a>
-                    <a href="https://manojmandava.blogspot.com/" target="_blank" class="social-link blogger"><i
-                            class="fab fa-blogger-b"></i><span>Blog</span></a>
+
+                <div class="social-icons premium-social-icons">
+                    <a href="https://www.linkedin.com/in/manojkmandava/" target="_blank" class="social-link linkedin">
+                        <i class="fab fa-linkedin-in"></i><span>LinkedIn</span>
+                    </a>
+                    <a href="https://github.com/ManojM9894" target="_blank" class="social-link github">
+                        <i class="fab fa-github"></i><span>GitHub</span>
+                    </a>
+                    <a href="https://substack.com/@manojmandava" target="_blank" class="social-link substack">
+                        <i class="fas fa-newspaper"></i><span>Substack</span>
+                    </a>
+                    <a href="https://medium.com/@manoj.mandava9" target="_blank" class="social-link medium">
+                        <i class="fab fa-medium-m"></i><span>Medium</span>
+                    </a>
+                    <a href="https://manojmandava.blogspot.com/" target="_blank" class="social-link blogger">
+                        <i class="fab fa-blogger-b"></i><span>Blog</span>
+                    </a>
                     <a href="https://public.tableau.com/app/profile/manoj.kumar.mandava/vizzes" target="_blank"
-                        class="social-link tableau"><i class="fas fa-chart-column"></i><span>Tableau</span></a>
-                    <a href="https://www.facebook.com/manoj.mandava" target="_blank" class="social-link facebook"><i
-                            class="fab fa-facebook-f"></i><span>Facebook</span></a>
-                    <a href="#" class="social-link instagram disabled"><i
-                            class="fab fa-instagram"></i><span>Instagram</span></a>
+                        class="social-link tableau">
+                        <i class="fas fa-chart-column"></i><span>Tableau</span>
+                    </a>
+                    <a href="https://www.facebook.com/manoj.mandava" target="_blank" class="social-link facebook">
+                        <i class="fab fa-facebook-f"></i><span>Facebook</span>
+                    </a>
+                    <a href="#" class="social-link instagram disabled">
+                        <i class="fab fa-instagram"></i><span>Instagram</span>
+                    </a>
                 </div>
+
+                <!-- Email button at bottom -->
                 <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
                     <a href="https://mail.google.com/mail/?view=cm&to=manojmandava@proton.me" target="_blank"
-                        class="premium-email-btn">
-                        <i class="fas fa-envelope"></i><span>manojmandava@proton.me</span>
+                        class="premium-email-btn" style="width:100%;justify-content:center">
+                        <i class="fas fa-envelope"></i>
+                        <span>manojmandava@proton.me</span>
                     </a>
                 </div>
             </div>
-            <div class="premium-contact-card">
+
+            <!-- RIGHT: Contact Form -->
+            <div class="contact-card premium-contact-card">
                 <div class="contact-card-top">
-                    <div class="contact-icon-badge"><i class="fas fa-paper-plane"></i></div>
+                    <div class="contact-icon-badge">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
                     <div>
                         <h3>Send a Message</h3>
-                        <p>Fill in the form and I'll get back to you as soon as possible.</p>
+                        <p>Fill in the form below and I'll get back to you as soon as possible.</p>
                     </div>
                 </div>
+
                 <form id="contactForm" class="contact-form-grid">
                     <div class="contact-form-group">
                         <label>Your Name</label>
@@ -219,48 +300,24 @@
                     </div>
                     <div class="contact-form-group full">
                         <label>Subject</label>
-                        <input type="text" placeholder="What is this about?" />
+                        <input type="text" placeholder="What is this about?" required />
                     </div>
                     <div class="contact-form-group full">
                         <label>Message</label>
                         <textarea rows="5" placeholder="Your message here..." required></textarea>
                     </div>
                     <div class="contact-form-group full">
-                        <button type="submit"><i class="fas fa-paper-plane"></i> Send Message</button>
+                        <button type="submit" class="btn-primary premium-email-btn"
+                            style="width:100%;justify-content:center;border:none;">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
                     </div>
                 </form>
             </div>
+
         </div>
     </section>
-
-    <!-- BLOG READER MODAL -->
-    <div id="blogReaderModal"
-        style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);overflow-y:auto;padding:2rem 1rem;">
-        <div
-            style="max-width:780px;margin:0 auto;background:#0d0d0d;border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
-            <div
-                style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#0d0d0d;z-index:1;">
-                <div style="display:flex;align-items:center;gap:0.8rem">
-                    <span style="color:var(--accent)">✍️</span>
-                    <span id="readerModalMeta"
-                        style="font-size:0.78rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em"></span>
-                </div>
-                <button onclick="closeBlogReader()"
-                    style="background:transparent;border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center"
-                    onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='#fff'"
-                    onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.4)'">✕</button>
-            </div>
-            <div style="padding:2rem 1.5rem">
-                <h1 id="readerModalTitle"
-                    style="font-size:1.8rem;font-weight:700;margin-bottom:1.5rem;color:#fff;line-height:1.2;letter-spacing:-0.03em">
-                </h1>
-                <div id="readerModalContent" style="color:rgba(255,255,255,0.6);line-height:1.8;font-size:0.95rem">
-                </div>
-                <div id="readerModalExternal"
-                    style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.07)"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- COLLECTION MODAL -->
     <div class="collection-modal" id="collectionModal">
@@ -287,9 +344,9 @@
 
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="./js/supabase-config.js"></script>
-    <script src="./js/github.js"></script>
-    <script src="./js/app.js"></script>
+    <script src="./Js/supabase-config.js"></script>
+    <script src="./Js/github.js"></script>
+    <script src="./Js/app.js"></script>
 </body>
 
 </html>

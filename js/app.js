@@ -29,7 +29,7 @@ const platformIcons = {
     '': '✍️'
 };
 
-let blogCache = [];
+let blogCache    = [];
 let galleryCache = [];
 let designsCache = [];
 let profileCache = null;
@@ -93,14 +93,14 @@ function renderHeroFromProfile(profile) {
 
     const { first, last } = splitName(profile.name);
 
-    const heroFirst = document.getElementById('hero-first-name');
-    const heroLast = document.getElementById('hero-last-name');
-    const heroTitle = document.getElementById('hero-title');
+    const heroFirst   = document.getElementById('hero-first-name');
+    const heroLast    = document.getElementById('hero-last-name');
+    const heroTitle   = document.getElementById('hero-title');
     const heroTagline = document.getElementById('hero-tagline');
 
-    if (heroFirst) heroFirst.textContent = first || '';
-    if (heroLast) heroLast.textContent = last || '';
-    if (heroTitle) heroTitle.textContent = profile.title || '';
+    if (heroFirst)   heroFirst.textContent   = first || '';
+    if (heroLast)    heroLast.textContent    = last  || '';
+    if (heroTitle)   heroTitle.textContent   = profile.title   || '';
     if (heroTagline) heroTagline.textContent = profile.tagline || '';
 }
 
@@ -111,15 +111,15 @@ async function renderAbout() {
 
         renderHeroFromProfile(about);
 
-        const nameEl = document.getElementById('about-name');
-        const bio1El = document.getElementById('about-bio1');
-        const bio2El = document.getElementById('about-bio2');
+        const nameEl   = document.getElementById('about-name');
+        const bio1El   = document.getElementById('about-bio1');
+        const bio2El   = document.getElementById('about-bio2');
         const skillsEl = document.getElementById('about-skills');
         const avatarEl = document.getElementById('about-avatar');
 
-        if (nameEl) nameEl.textContent = about.name || '';
-        if (bio1El) bio1El.textContent = about.bio1 || '';
-        if (bio2El) bio2El.textContent = about.bio2 || '';
+        if (nameEl)   nameEl.textContent   = about.name || '';
+        if (bio1El)   bio1El.textContent   = about.bio1 || '';
+        if (bio2El)   bio2El.textContent   = about.bio2 || '';
 
         if (avatarEl) {
             avatarEl.innerHTML = about.avatar_url
@@ -169,8 +169,8 @@ async function renderGallery() {
                             <div class="carousel-card">
                                 <div class="carousel-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
                                     ${item.image_url
-                ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🎨</div>`}
+                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
+                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🎨</div>`}
                                     ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                 </div>
                             </div>
@@ -221,8 +221,8 @@ async function renderDesigns() {
                             <div class="carousel-card">
                                 <div class="carousel-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
                                     ${item.image_url
-                ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🖌️</div>`}
+                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
+                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">🖌️</div>`}
                                     ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                 </div>
                             </div>
@@ -292,6 +292,7 @@ async function renderBlog() {
         list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to load blog.</p></div>`;
     }
 }
+
 // ==========================================
 // RECENT WORKS
 // ==========================================
@@ -320,8 +321,8 @@ function renderRecentWorks() {
             <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${merged.length}">
                 <div class="recent-works-track">
                     ${loopItems.map(item => {
-        if (item.type === 'blog') {
-            return `
+                        if (item.type === 'blog') {
+                            return `
                                 <div class="recent-work-card">
                                     <div class="recent-work-image"
                                         style="display:flex;align-items:flex-end;padding:1rem;background:var(--surface);cursor:pointer"
@@ -329,17 +330,17 @@ function renderRecentWorks() {
                                         ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                     </div>
                                 </div>`;
-        }
-        return `
+                        }
+                        return `
                             <div class="recent-work-card">
                                 <div class="recent-work-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
                                     ${item.image_url
-                ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
+                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
+                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
                                     ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                 </div>
                             </div>`;
-    }).join('')}
+                    }).join('')}
                 </div>
             </div>
         </div>`;
@@ -347,86 +348,67 @@ function renderRecentWorks() {
     initCenterCarousels();
 }
 
-const collectionRenderState = {
-    type: '',
-    limit: 20
-};
-
-function getCollectionItems(type) {
-    if (type === 'gallery') return galleryCache || [];
-    if (type === 'designs') return designsCache || [];
-    if (type === 'blog') return blogCache || [];
-    return [];
-}
-
-function renderCollectionModalContent(type) {
+// ==========================================
+// COLLECTION MODAL
+// ==========================================
+function openCollectionModal(type) {
+    const modal = document.getElementById('collectionModal');
     const title = document.getElementById('collectionModalTitle');
     const content = document.getElementById('collectionModalContent');
-    if (!title || !content) return;
 
-    const allItems = getCollectionItems(type);
-    const visibleItems = allItems.slice(0, collectionRenderState.limit);
+    if (!modal || !title || !content) return;
 
+    // reset default class first
     content.className = 'collection-modal-content';
-    if (type === 'blog') {
-        content.classList.add('blog-collection-grid');
-    }
 
     if (type === 'gallery') {
         title.textContent = 'All Artworks';
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
+        content.innerHTML = galleryCache.length
+            ? galleryCache.map(item => `
                 <div class="collection-grid-card">
-                    ${item.image_url ? `
-                        <img
-                            loading="lazy"
-                            src="${escapeAttr(item.image_url)}"
-                            alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
-                            style="opacity:0;transition:opacity 0.3s ease"
-                            onload="this.style.opacity='1'"
-                        >
-                    ` : ''}
+                    ${item.image_url
+                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
+                        : ''}
                     <div class="collection-grid-info">
-                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.45rem">${escapeHtml(item.description)}</div>` : ''}
+                        ${item.title ? `<strong>${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.5rem;font-size:0.85rem">${escapeHtml(item.description)}</div>` : ''}
                     </div>
                 </div>
             `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
-    }
-
-    else if (type === 'designs') {
+            : `
+                <div class="empty-state" style="grid-column:1/-1">
+                    <div class="empty-state-icon">🎨</div>
+                    <p>No artworks yet.</p>
+                </div>
+            `;
+    } else if (type === 'designs') {
         title.textContent = 'All Designs';
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
+        content.innerHTML = designsCache.length
+            ? designsCache.map(item => `
                 <div class="collection-grid-card">
-                    ${item.image_url ? `
-                        <img
-                            loading="lazy"
-                            src="${escapeAttr(item.image_url)}"
-                            alt="${escapeHtml(item.title || '')}"
-                            onclick="openLightbox('${escapeAttr(item.image_url)}')"
-                            style="opacity:0;transition:opacity 0.3s ease"
-                            onload="this.style.opacity='1'"
-                        >
-                    ` : ''}
+                    ${item.image_url
+                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}" onclick="openLightbox('${escapeAttr(item.image_url)}')">`
+                        : ''}
                     <div class="collection-grid-info">
-                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
-                        ${item.description ? `<div style="margin-top:0.45rem">${escapeHtml(item.description)}</div>` : ''}
+                        ${item.title ? `<strong>${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.5rem;font-size:0.85rem">${escapeHtml(item.description)}</div>` : ''}
                     </div>
                 </div>
             `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
-    }
-
-    else if (type === 'blog') {
+            : `
+                <div class="empty-state" style="grid-column:1/-1">
+                    <div class="empty-state-icon">🖌️</div>
+                    <p>No designs yet.</p>
+                </div>
+            `;
+    } else if (type === 'blog') {
         title.textContent = 'All Blog Posts';
+        content.className = 'collection-modal-content blog-collection-grid';
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
+        content.innerHTML = (blogCache && blogCache.length)
+            ? blogCache.map(item => `
                 <div class="collection-blog-card">
                     <div class="collection-blog-meta">
                         ${escapeHtml(item.category || 'Blog')}
@@ -436,7 +418,7 @@ function renderCollectionModalContent(type) {
                     <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
                     <div class="collection-blog-excerpt">${escapeHtml(item.excerpt || '')}</div>
                     <div class="collection-blog-actions">
-                        <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
+                        <button class="collection-blog-btn" onclick="openBlogReader(${item.id})">
                             Read Post
                         </button>
                         ${item.url ? `
@@ -447,74 +429,20 @@ function renderCollectionModalContent(type) {
                     </div>
                 </div>
             `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+            : `
+                <div class="empty-state">
+                    <div class="empty-state-icon">✍️</div>
+                    <p>No blog posts yet.</p>
+                </div>
+            `;
     }
-
-    if (allItems.length > collectionRenderState.limit) {
-        content.innerHTML += `
-            <div class="collection-load-more-wrap">
-                <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
-                    Load More
-                </button>
-            </div>
-        `;
-    }
-}
-
-function openCollectionModal(type) {
-    const modal = document.getElementById('collectionModal');
-    const title = document.getElementById('collectionModalTitle');
-    const content = document.getElementById('collectionModalContent');
-
-    if (!modal || !title || !content) {
-        console.error('Collection modal elements not found');
-        return;
-    }
-
-    collectionRenderState.type = type;
-    collectionRenderState.limit = 20;
-
-    renderCollectionModalContent(type);
 
     modal.classList.add('open');
-    document.body.classList.add('modal-open');
-
-    document.querySelectorAll('.center-carousel').forEach(el => {
-        el.style.pointerEvents = 'none';
-    });
-}
-
-function loadMoreCollectionItems() {
-    if (!collectionRenderState.type) return;
-    collectionRenderState.limit += 20;
-    renderCollectionModalContent(collectionRenderState.type);
 }
 
 function closeCollectionModal() {
     const modal = document.getElementById('collectionModal');
-    const content = document.getElementById('collectionModalContent');
-
     if (modal) modal.classList.remove('open');
-
-    if (content) {
-        content.innerHTML = '';
-        content.scrollTop = 0;
-        content.className = 'collection-modal-content';
-    }
-
-    collectionRenderState.type = '';
-    collectionRenderState.limit = 20;
-
-    document.body.classList.remove('modal-open');
-
-    document.querySelectorAll('.center-carousel').forEach(el => {
-        el.style.pointerEvents = '';
-    });
-}
-
-function openBlogReaderFromCollection(id) {
-    closeCollectionModal();
-    setTimeout(() => openBlogReader(id), 180);
 }
 // ==========================================
 // BLOG READER MODAL
@@ -524,19 +452,19 @@ function openBlogReader(id) {
     const post = blogCache.find(item => Number(item.id) === Number(id));
     if (!post) return;
 
-    const modal = document.getElementById('blogReaderModal');
-    const titleEl = document.getElementById('readerModalTitle');
-    const metaEl = document.getElementById('readerModalMeta');
-    const contentEl = document.getElementById('readerModalContent');
+    const modal      = document.getElementById('blogReaderModal');
+    const titleEl    = document.getElementById('readerModalTitle');
+    const metaEl     = document.getElementById('readerModalMeta');
+    const contentEl  = document.getElementById('readerModalContent');
     const externalEl = document.getElementById('readerModalExternal');
 
     if (titleEl) titleEl.textContent = post.title || 'Blog Post';
 
     if (metaEl) {
         const parts = [];
-        if (post.category) parts.push(post.category);
+        if (post.category)  parts.push(post.category);
         if (post.post_date) parts.push(post.post_date);
-        if (post.platform) parts.push(post.platform);
+        if (post.platform)  parts.push(post.platform);
         metaEl.textContent = parts.join(' · ');
     }
 
@@ -554,7 +482,7 @@ function openBlogReader(id) {
 
     if (modal) {
         modal.style.display = 'block';
-        modal.scrollTop = 0;
+        modal.scrollTop     = 0;
         document.body.style.overflow = 'hidden';
     }
 }
@@ -572,7 +500,7 @@ function closeBlogReader() {
 function openLightbox(src) {
     if (!src) return;
     const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
+    const img      = document.getElementById('lightboxImg');
     if (!lightbox || !img) return;
     img.src = src;
     lightbox.classList.add('active');
@@ -600,46 +528,46 @@ function initCenterCarousels() {
         const cards = [...track.children];
         if (!cards.length) return;
 
-        const originalCount = Number(wrap.dataset.originalCount || Math.floor(cards.length / 3) || cards.length);
-        const gap = parseFloat(getComputedStyle(track).gap || '0');
-        const firstCard = cards[0];
-        const unitWidth = firstCard.offsetWidth + gap;
-        const setWidth = unitWidth * originalCount;
+        const originalCount   = Number(wrap.dataset.originalCount || Math.floor(cards.length / 3) || cards.length);
+        const gap             = parseFloat(getComputedStyle(track).gap || '0');
+        const firstCard       = cards[0];
+        const unitWidth       = firstCard.offsetWidth + gap;
+        const setWidth        = unitWidth * originalCount;
 
-        let position = 0;
-        let velocity = 0.45;
-        let isDragging = false;
-        let startX = 0;
+        let position          = 0;
+        let velocity          = 0.45;
+        let isDragging        = false;
+        let startX            = 0;
         let dragStartPosition = 0;
 
-        wrap.style.overflow = 'hidden';
+        wrap.style.overflow    = 'hidden';
         track.style.willChange = 'transform';
-        track.style.transform = 'translate3d(0,0,0)';
+        track.style.transform  = 'translate3d(0,0,0)';
 
         function applyDockEffect() {
-            const wrapRect = wrap.getBoundingClientRect();
-            const centerX = wrapRect.left + wrapRect.width / 2;
+            const wrapRect     = wrap.getBoundingClientRect();
+            const centerX      = wrapRect.left + wrapRect.width / 2;
             const visibleCards = track.querySelectorAll('.carousel-card, .blog-carousel-card, .recent-work-card');
 
             visibleCards.forEach((card) => {
-                const rect = card.getBoundingClientRect();
+                const rect       = card.getBoundingClientRect();
                 const cardCenter = rect.left + rect.width / 2;
-                const dist = Math.abs(centerX - cardCenter);
-                const maxDist = wrapRect.width * 0.5;
-                const ratio = Math.min(dist / maxDist, 1);
-                const scale = 1.06 - ratio * 0.24;
-                const lift = (1 - ratio) * 8;
-                const opacity = 1 - ratio * 0.35;
+                const dist       = Math.abs(centerX - cardCenter);
+                const maxDist    = wrapRect.width * 0.5;
+                const ratio      = Math.min(dist / maxDist, 1);
+                const scale      = 1.06 - ratio * 0.24;
+                const lift       = (1 - ratio) * 8;
+                const opacity    = 1 - ratio * 0.35;
 
                 card.style.transform = `translateY(${-lift}px) scale(${scale})`;
-                card.style.opacity = `${opacity}`;
+                card.style.opacity   = `${opacity}`;
                 card.classList.toggle('is-active', ratio < 0.16);
             });
         }
 
         function normalizeLoop() {
             while (position <= -setWidth) position += setWidth;
-            while (position > 0) position -= setWidth;
+            while (position > 0)          position -= setWidth;
         }
 
         function render() {
@@ -660,7 +588,7 @@ function initCenterCarousels() {
 
         function addImpulse(delta) {
             velocity += delta;
-            if (velocity > 18) velocity = 18;
+            if (velocity >  18) velocity =  18;
             if (velocity < -18) velocity = -18;
         }
 
@@ -673,8 +601,8 @@ function initCenterCarousels() {
         }, { passive: false });
 
         wrap.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.clientX;
+            isDragging        = true;
+            startX            = e.clientX;
             dragStartPosition = position;
             wrap.classList.add('is-dragging');
         });
@@ -687,7 +615,7 @@ function initCenterCarousels() {
 
         window.addEventListener('mouseup', (e) => {
             if (!isDragging) return;
-            const dx = e.clientX - startX;
+            const dx   = e.clientX - startX;
             isDragging = false;
             wrap.classList.remove('is-dragging');
             addImpulse(-(dx * 0.02));
@@ -695,8 +623,8 @@ function initCenterCarousels() {
 
         wrap.addEventListener('touchstart', (e) => {
             if (!e.touches[0]) return;
-            isDragging = true;
-            startX = e.touches[0].clientX;
+            isDragging        = true;
+            startX            = e.touches[0].clientX;
             dragStartPosition = position;
         }, { passive: true });
 
@@ -719,9 +647,9 @@ function initCenterCarousels() {
 // ==========================================
 
 function initAdminMenu() {
-    const adminMenuBtn = document.getElementById('adminMenuBtn');
+    const adminMenuBtn  = document.getElementById('adminMenuBtn');
     const adminDropdown = document.getElementById('adminDropdown');
-    const openAdminBtn = document.getElementById('openAdminBtn');
+    const openAdminBtn  = document.getElementById('openAdminBtn');
 
     if (adminMenuBtn && adminDropdown) {
         adminMenuBtn.addEventListener('click', (event) => {
@@ -733,12 +661,12 @@ function initAdminMenu() {
             adminDropdown.classList.remove('open');
         });
     }
+
     if (openAdminBtn) {
         openAdminBtn.addEventListener('click', () => {
-            window.open('https://manojm9894.github.io/portfolio-site/admin.html', '_blank', 'noopener,noreferrer');
+            window.open('./admin.html', '_blank', 'noopener,noreferrer');
         });
     }
-
 }
 
 // ==========================================
@@ -747,8 +675,8 @@ function initAdminMenu() {
 
 function initNav() {
     const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-links');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const navMenu   = document.querySelector('.nav-links');
+    const navLinks  = document.querySelectorAll('.nav-links a');
 
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
@@ -795,6 +723,11 @@ function initLightbox() {
         });
     }
 
+    const collectionModal = document.getElementById('collectionModal');
+    if (collectionModal) {
+        collectionModal.querySelector('.collection-modal-backdrop')
+            ?.addEventListener('click', closeCollectionModal);
+    }
 }
 
 // ==========================================
@@ -808,21 +741,21 @@ function initContactForm() {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const btn = contactForm.querySelector('button[type="submit"]');
+        const btn          = contactForm.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
-        btn.innerHTML = 'Sending... ⏳';
-        btn.disabled = true;
+        btn.innerHTML      = 'Sending... ⏳';
+        btn.disabled       = true;
 
-        const inputs = contactForm.querySelectorAll('input, textarea');
-        const name = inputs[0]?.value.trim() || '';
-        const email = inputs[1]?.value.trim() || '';
+        const inputs  = contactForm.querySelectorAll('input, textarea');
+        const name    = inputs[0]?.value.trim() || '';
+        const email   = inputs[1]?.value.trim() || '';
         const subject = inputs[2]?.value.trim() || '';
         const message = inputs[3]?.value.trim() || '';
 
         if (!name || !email || !message) {
             showToast('⚠️ Please fill in all required fields.');
             btn.innerHTML = originalText;
-            btn.disabled = false;
+            btn.disabled  = false;
             return;
         }
 
@@ -841,7 +774,7 @@ function initContactForm() {
             showToast('❌ Failed to send. Please email directly.');
         } finally {
             btn.innerHTML = originalText;
-            btn.disabled = false;
+            btn.disabled  = false;
         }
     });
 }
@@ -909,22 +842,15 @@ async function submitContactMessage(event) {
     btn.innerHTML = originalText;
     btn.disabled = false;
 }
-function openBlogReaderFromModal(id) {
-    openBlogReaderFromCollection(id);
-}
 
-window.openBlogReaderFromModal = openBlogReaderFromModal;
-window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 // ==========================================
 // GLOBALS FOR INLINE HTML
 // ==========================================
 
-window.openLightbox            = openLightbox;
-window.closeLightbox           = closeLightbox;
-window.openBlogReader          = openBlogReader;
-window.closeBlogReader         = closeBlogReader;
-window.openCollectionModal     = openCollectionModal;
-window.closeCollectionModal    = closeCollectionModal;
-window.openBlogReaderFromCollection = openBlogReaderFromCollection;
-window.submitContactMessage    = submitContactMessage;
-window.loadMoreCollectionItems = loadMoreCollectionItems;
+window.openLightbox         = openLightbox;
+window.closeLightbox        = closeLightbox;
+window.openBlogReader       = openBlogReader;
+window.closeBlogReader      = closeBlogReader;
+window.openCollectionModal  = openCollectionModal;
+window.closeCollectionModal = closeCollectionModal;
+window.submitContactMessage = submitContactMessage;

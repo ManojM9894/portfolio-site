@@ -333,15 +333,11 @@
     </div>
 
     <div class="lightbox" id="lightbox">
-    <div class="lightbox-content" id="lightboxContent">
-        <button class="lightbox-nav lightbox-prev" onclick="showPrevLightboxImage()">‹</button>
-
-        <div class="lightbox-stage" id="lightboxStage">
-            <img id="lightboxImg" src="" alt="Preview" />
-        </div>
-
-        <button class="lightbox-nav lightbox-next" onclick="showNextLightboxImage()">›</button>
+    <div class="lightbox-content">
         <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+        <button class="lightbox-nav lightbox-prev" onclick="goToPrev()">‹</button>
+        <img id="lightboxImg" src="" alt="Preview"/>
+        <button class="lightbox-nav lightbox-next" onclick="goToNext()">›</button>
     </div>
 </div>
 

@@ -1274,3 +1274,20 @@ window.closeCollectionModal = closeCollectionModal;
 window.loadMoreCollectionItems = loadMoreCollectionItems;
 
 window.submitContactMessage = submitContactMessage;
+window.goToPrev = () => {
+    const idx = lightboxIndex <= 0 ? lightboxImages.length - 1 : lightboxIndex - 1;
+    const lb = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+    lightboxIndex = idx;
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = lightboxImages[lightboxIndex]; img.style.opacity = '1'; }, 180);
+};
+
+window.goToNext = () => {
+    const idx = lightboxIndex >= lightboxImages.length - 1 ? 0 : lightboxIndex + 1;
+    const lb = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+    lightboxIndex = idx;
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = lightboxImages[lightboxIndex]; img.style.opacity = '1'; }, 180);
+};

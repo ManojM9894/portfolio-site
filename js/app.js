@@ -635,48 +635,34 @@ function renderCollectionModalContent(type) {
                 </div>
             `).join('')
             : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
-    } else if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid';
+    }else if (type === 'blog') {
+    title.textContent = 'All Blog Posts';
+    content.className = 'collection-modal-content blog-collection-grid';
 
-        content.innerHTML = visibleItems.length
-            ? visibleItems.map(item => `
-                <div class="collection-blog-card">
-                    <div class="collection-blog-meta">
-                        ${escapeHtml(item.category || 'Blog')}
-                        ${item.post_date ? ' · ' + escapeHtml(item.post_date) : ''}
-                        ${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
-                    </div>
-                    <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
-                    <div class="collection-blog-excerpt">${escapeHtml(item.excerpt || '')}</div>
-                    <div class="collection-blog-actions">
-                        ${item.content ? `
-                            <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
-                                Read Post
-                            </button>
-                        ` : ''}
-                        ${item.url ? `
-                            <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
-                                Open Link
-                            </a>
-                        ` : ''}
-                    </div>
+    content.innerHTML = visibleItems.length
+        ? visibleItems.map(item => `
+            <div class="collection-blog-card">
+                <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
+                ${item.excerpt ? `
+                    <div class="collection-blog-excerpt">${escapeHtml(item.excerpt)}</div>
+                ` : ''}
+                <div class="collection-blog-actions">
+                    ${item.content ? `
+                        <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
+                            Read Post
+                        </button>
+                    ` : ''}
+                    ${item.url ? `
+                        <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
+                            Open Link
+                        </a>
+                    ` : ''}
                 </div>
-            `).join('')
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
-    }
-
-    if (allItems.length > collectionRenderState.limit) {
-        content.innerHTML += `
-            <div class="collection-load-more-wrap">
-                <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
-                    Load More
-                </button>
             </div>
-        `;
-    }
+        `).join('')
+        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
 }
-
+}
 function initCollectionModalSwipe() {
     const panel = document.querySelector('.collection-modal-panel');
     if (!panel || panel.dataset.swipeInit === 'true') return;

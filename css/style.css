@@ -2737,3 +2737,134 @@ MOBILE BLOG POPUP FIX
         display: none !important;
     }
 }
+/* ==========================================
+   FINAL MOBILE POPUP FIX + DESKTOP ARROWS
+========================================== */
+
+/* DESKTOP: show arrows */
+.lightbox-nav.lightbox-prev,
+.lightbox-nav.lightbox-next {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    background: rgba(12,12,12,0.72) !important;
+    color: #fff !important;
+    font-size: 1.4rem !important;
+    cursor: pointer !important;
+    z-index: 8 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.lightbox-nav.lightbox-prev { left: -56px !important; }
+.lightbox-nav.lightbox-next { right: -56px !important; }
+
+/* MOBILE: hide arrows */
+@media (max-width: 768px) {
+    .lightbox-nav.lightbox-prev,
+    .lightbox-nav.lightbox-next {
+        display: none !important;
+    }
+
+    /* BLOG POPUP = single column clean cards */
+    .collection-modal-content.blog-collection-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+        padding: 0.85rem !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-card {
+        min-height: 0 !important;
+        padding: 0.9rem !important;
+        border-radius: 14px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.65rem !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-title {
+        font-size: 0.95rem !important;
+        line-height: 1.35 !important;
+        font-weight: 700 !important;
+        color: #fff !important;
+        word-break: break-word !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-excerpt {
+        font-size: 0.78rem !important;
+        line-height: 1.5 !important;
+        color: rgba(255,255,255,0.56) !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    .collection-modal-content.blog-collection-grid .collection-blog-btn {
+        width: 100% !important;
+        min-height: 38px !important;
+        font-size: 0.72rem !important;
+        padding: 0.65rem 0.75rem !important;
+    }
+
+    /* GALLERY + DESIGNS = stable 2-column square grid */
+    .collection-modal-content:not(.blog-collection-grid) {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.65rem !important;
+        padding: 0.8rem !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-card {
+        position: relative !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        background: #111 !important;
+        aspect-ratio: 1 / 1 !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-card img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    /* show titles on mobile over image */
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 0.55rem 0.65rem 0.6rem !important;
+        background: linear-gradient(to top, rgba(0,0,0,0.82), transparent) !important;
+        color: #fff !important;
+        font-size: 0.7rem !important;
+        line-height: 1.25 !important;
+        z-index: 2 !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info strong {
+        display: block !important;
+        color: #fff !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        line-height: 1.25 !important;
+        word-break: break-word !important;
+    }
+
+    .collection-modal-content:not(.blog-collection-grid) .collection-grid-info div {
+        display: none !important;
+    }
+}

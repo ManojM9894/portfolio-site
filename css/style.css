@@ -2570,3 +2570,49 @@ MOBILE BLOG POPUP FIX
         display: none !important;
     }
 }
+@media (max-width: 768px) {
+    .lightbox-close {
+        display: none !important;
+    }
+}
+/* Revert blog view-all popup to old card layout */
+.ios-notes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+.ios-note-card,
+.ios-note-button {
+    all: unset;
+}
+
+/* Use normal blog modal cards again */
+.collection-modal-content.blog-collection-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+@media (max-width: 768px) {
+    .collection-modal-content.blog-collection-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+        padding: 0.85rem !important;
+    }
+}
+/* Lightbox arrows: desktop only */
+.lightbox-prev,
+.lightbox-next,
+.lightbox-nav {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .lightbox-prev,
+    .lightbox-next,
+    .lightbox-nav {
+        display: none !important;
+    }
+}

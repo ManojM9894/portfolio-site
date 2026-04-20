@@ -1,5 +1,5 @@
 // ==========================================
-// APP.JS - PUBLIC SITE (FINAL CLEAN VERSION)
+// APP.JS - PUBLIC SITE (CLEAN FINAL VERSION)
 // ==========================================
 
 function escapeHtml(value) {
@@ -29,10 +29,31 @@ const platformIcons = {
     '': '✍️'
 };
 
+const galleryCache = [];
+const designsCache = [];
 let blogCache = [];
-let galleryCache =[];
-let designsCache = [];
 let profileCache = null;
+
+const collectionRenderState = {
+    type: '',
+    limit: 20
+};
+
+let collectionTouchStartY = 0;
+let collectionTouchEndY = 0;
+
+let lightboxImages = [];
+let lightboxIndex = 0;
+let lightboxScale = 1;
+let lightboxTranslateX = 0;
+let lightboxTranslateY = 0;
+let lightboxStartDistance = 0;
+let lightboxStartScale = 1;
+let lightboxPanStartX = 0;
+let lightboxPanStartY = 0;
+let lightboxTouchStartX = 0;
+let lightboxTouchEndX = 0;
+
 // ==========================================
 // DATA FETCHING
 // ==========================================
@@ -43,6 +64,7 @@ async function fetchGallery() {
         .select('*')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
 }
@@ -53,6 +75,7 @@ async function fetchDesigns() {
         .select('*')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
 }
@@ -63,6 +86,7 @@ async function fetchBlogs() {
         .select('*')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
 }
@@ -72,6 +96,7 @@ async function fetchProfile() {
         .from('profile')
         .select('*')
         .limit(1);
+
     if (error) throw error;
     return Array.isArray(data) && data.length ? data[0] : null;
 }
@@ -136,9 +161,55 @@ async function renderAbout() {
         console.error('Failed to load profile:', error);
     }
 }
-/* ==========================================
-   CAROUSEL
-========================================== */
+
+// ==========================================
+// CARD BUILDERS
+// ==========================================
+
+function buildGalleryCard(item) {
+    const imageUrl = item?.image_url || '';
+    const title = item?.title || '';
+
+    return `
+        <div class="carousel-card">
+            <div class="carousel-image" onclick="openGalleryLightbox('${escapeAttr(imageUrl)}')">
+                ${imageUrl
+                    ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async">`
+                    : `<div class="empty-state"><div class="empty-state-icon">🎨</div></div>`}
+                ${title ? `
+                    <div class="image-title-overlay">
+                        <span>${escapeHtml(title)}</span>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function buildDesignCard(item) {
+    const imageUrl = item?.image_url || '';
+    const title = item?.title || '';
+
+    return `
+        <div class="carousel-card">
+            <div class="carousel-image" onclick="openDesignLightbox('${escapeAttr(imageUrl)}')">
+                ${imageUrl
+                    ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async">`
+                    : `<div class="empty-state"><div class="empty-state-icon">🖌️</div></div>`}
+                ${title ? `
+                    <div class="image-title-overlay">
+                        <span>${escapeHtml(title)}</span>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// ==========================================
+// CAROUSEL
+// ==========================================
+
 function initCenterCarousels() {
     const wraps = document.querySelectorAll('.center-carousel');
 
@@ -166,39 +237,15 @@ function initCenterCarousels() {
         let isDragging = false;
         let startX = 0;
         let dragStartPosition = 0;
-        let touchLastX = 0;
-        let touchLastTime = 0;
 
         wrap.style.touchAction = 'pan-y';
-
-        wrap.addEventListener('touchstart', (e) => {
-            if (!e.touches[0]) return;
-            isDragging = true;
-            startX = e.touches[0].clientX;
-            dragStartPosition = position;
-            velocity = 0;
-        }, { passive: true });
-
-        wrap.addEventListener('touchmove', (e) => {
-            if (!isDragging || !e.touches[0]) return;
-            const dx = e.touches[0].clientX - startX;
-            position = dragStartPosition + dx;
-            render();
-        }, { passive: true });
-
-        wrap.addEventListener('touchend', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            const dx = (e.changedTouches[0]?.clientX || startX) - startX;
-            addImpulse(-(dx * 0.04));
-        });
+        wrap.style.overflow = 'hidden';
+        track.style.willChange = 'transform';
 
         function applyDockEffect() {
             const wrapRect = wrap.getBoundingClientRect();
             const centerX = wrapRect.left + wrapRect.width / 2;
-            const visibleCards = track.querySelectorAll(
-                '.carousel-card, .blog-carousel-card, .recent-work-card'
-            );
+            const visibleCards = track.querySelectorAll('.carousel-card, .blog-carousel-card, .recent-work-card');
 
             visibleCards.forEach((card) => {
                 const rect = card.getBoundingClientRect();
@@ -244,17 +291,13 @@ function initCenterCarousels() {
             if (velocity < -18) velocity = -18;
         }
 
-        wrap.addEventListener(
-            'wheel',
-            (e) => {
-                e.preventDefault();
-                const delta = e.deltaY || e.deltaX;
-                position -= delta * 0.9;
-                addImpulse(delta * 0.015);
-                render();
-            },
-            { passive: false }
-        );
+        wrap.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY || e.deltaX;
+            position -= delta * 0.9;
+            addImpulse(delta * 0.015);
+            render();
+        }, { passive: false });
 
         wrap.addEventListener('mousedown', (e) => {
             isDragging = true;
@@ -277,16 +320,13 @@ function initCenterCarousels() {
             addImpulse(-(dx * 0.02));
         });
 
-        wrap.addEventListener(
-            'touchstart',
-            (e) => {
-                if (!e.touches[0]) return;
-                isDragging = true;
-                startX = e.touches[0].clientX;
-                dragStartPosition = position;
-            },
-            { passive: true }
-        );
+        wrap.addEventListener('touchstart', (e) => {
+            if (!e.touches[0]) return;
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            dragStartPosition = position;
+            velocity = 0;
+        }, { passive: true });
 
         wrap.addEventListener('touchmove', (e) => {
             if (!isDragging || !e.touches[0]) return;
@@ -295,13 +335,15 @@ function initCenterCarousels() {
             render();
         }, { passive: true });
 
-        wrap.addEventListener('touchend', () => {
+        wrap.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const endX = e.changedTouches?.[0]?.clientX ?? startX;
+            const dx = endX - startX;
             isDragging = false;
+            addImpulse(-(dx * 0.04));
         });
 
-        window.addEventListener('resize', () => {
-            render();
-        });
+        window.addEventListener('resize', render);
 
         render();
         requestAnimationFrame(animate);
@@ -312,46 +354,6 @@ function initCenterCarousels() {
 // GALLERY
 // ==========================================
 
-
-function buildGalleryCard(item) {
-    const imageUrl = item?.image_url || '';
-    const title = item?.title || '';
-
-    return `
-        <div class="carousel-card">
-            <div class="carousel-image" onclick="openGalleryLightbox('${escapeAttr(imageUrl)}')">
-                ${imageUrl ? `
-                    <img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}">
-                ` : `
-                    <div class="empty-state">🎨</div>
-                `}
-                <div class="image-title-overlay">
-                    <span>${escapeHtml(title)}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function buildDesignCard(item) {
-    const imageUrl = item?.image_url || '';
-    const title = item?.title || '';
-
-    return `
-        <div class="carousel-card">
-            <div class="carousel-image" onclick="openDesignLightbox('${escapeAttr(imageUrl)}')">
-                ${imageUrl ? `
-                    <img src="${escapeAttr(imageUrl)}" alt="${escapeHtml(title)}">
-                ` : `
-                    <div class="empty-state">🖌️</div>
-                `}
-                <div class="image-title-overlay">
-                    <span>${escapeHtml(title)}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
 async function renderGallery() {
     const container = document.getElementById('galleryGrid');
     if (!container) return;
@@ -441,6 +443,7 @@ async function renderDesigns() {
         `;
     }
 }
+
 // ==========================================
 // BLOG
 // ==========================================
@@ -448,11 +451,18 @@ async function renderDesigns() {
 async function renderBlog() {
     const list = document.getElementById('blogList');
     if (!list) return;
+
     try {
         const items = await fetchBlogs();
         blogCache = items;
+
         if (!items.length) {
-            list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✍️</div><p>Articles coming soon!</p></div>`;
+            list.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">✍️</div>
+                    <p>Articles coming soon!</p>
+                </div>
+            `;
             return;
         }
 
@@ -474,21 +484,28 @@ async function renderBlog() {
                                 <div class="blog-scroll-excerpt">${escapeHtml(item.excerpt || '')}</div>
                                 <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap">
                                     ${item.content
-                ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
-                : ''}
+                                        ? `<button class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openBlogReader(${item.id})">Read Post →</button>`
+                                        : ''}
                                     ${item.url
-                ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
-                : ''}
+                                        ? `<a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="padding:0.45rem 1rem;font-size:0.8rem">Read on ${escapeHtml(item.platform || 'External')} →</a>`
+                                        : ''}
                                 </div>
-                            </div>`).join('')}
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
-            </div>`;
+            </div>
+        `;
 
         initCenterCarousels();
-    } catch (e) {
-        console.error('Blog error:', e);
-        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to load blog.</p></div>`;
+    } catch (error) {
+        console.error('Blog error:', error);
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <p>Failed to load blog.</p>
+            </div>
+        `;
     }
 }
 
@@ -520,29 +537,37 @@ function renderRecentWorks() {
             <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${merged.length}">
                 <div class="recent-works-track">
                     ${loopItems.map(item => {
-        if (item.type === 'blog') {
-            return `
+                        if (item.type === 'blog') {
+                            return `
                                 <div class="recent-work-card">
                                     <div class="recent-work-image"
                                         style="display:flex;align-items:flex-end;padding:1rem;background:var(--surface);cursor:pointer"
                                         onclick="openBlogReader(${item.id})">
                                         ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                     </div>
-                                </div>`;
-        }
-        return `
+                                </div>
+                            `;
+                        }
+
+                        const clickHandler = item.type === 'gallery'
+                            ? `openGalleryLightbox('${escapeAttr(item.image_url || '')}')`
+                            : `openDesignLightbox('${escapeAttr(item.image_url || '')}')`;
+
+                        return `
                             <div class="recent-work-card">
-                                <div class="recent-work-image" onclick="openLightbox('${escapeAttr(item.image_url || '')}')">
+                                <div class="recent-work-image" onclick="${clickHandler}">
                                     ${item.image_url
-                ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
-                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
+                                        ? `<img src="${escapeAttr(item.image_url)}" alt="${escapeHtml(item.title || '')}">`
+                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem">${item.type === 'gallery' ? '🎨' : '🖌️'}</div>`}
                                     ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
                                 </div>
-                            </div>`;
-    }).join('')}
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
-        </div>`;
+        </div>
+    `;
 
     initCenterCarousels();
 }
@@ -550,13 +575,107 @@ function renderRecentWorks() {
 // ==========================================
 // COLLECTION MODAL
 // ==========================================
-const collectionRenderState = {
-    type: '',
-    limit: 20
-};
 
-let collectionTouchStartY = 0;
-let collectionTouchEndY = 0;
+function getCollectionItems(type) {
+    if (type === 'gallery') return galleryCache || [];
+    if (type === 'designs') return designsCache || [];
+    if (type === 'blog') return blogCache || [];
+    return [];
+}
+
+function renderCollectionModalContent(type) {
+    const title = document.getElementById('collectionModalTitle');
+    const content = document.getElementById('collectionModalContent');
+    if (!title || !content) return;
+
+    const allItems = getCollectionItems(type);
+    const visibleItems = allItems.slice(0, collectionRenderState.limit);
+
+    content.className = 'collection-modal-content';
+
+    if (type === 'gallery') {
+        title.textContent = 'All Artworks';
+
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
+                <div class="collection-grid-card">
+                    ${item.image_url ? `
+                        <img
+                            loading="lazy"
+                            src="${escapeAttr(item.image_url)}"
+                            alt="${escapeHtml(item.title || '')}"
+                            onclick="openGalleryLightbox('${escapeAttr(item.image_url)}')"
+                        >
+                    ` : ''}
+                    <div class="collection-grid-info">
+                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.4rem">${escapeHtml(item.description)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('')
+            : `<div class="empty-state" style="grid-column:1/-1"><p>No artworks yet.</p></div>`;
+    } else if (type === 'designs') {
+        title.textContent = 'All Designs';
+
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
+                <div class="collection-grid-card">
+                    ${item.image_url ? `
+                        <img
+                            loading="lazy"
+                            src="${escapeAttr(item.image_url)}"
+                            alt="${escapeHtml(item.title || '')}"
+                            onclick="openDesignLightbox('${escapeAttr(item.image_url)}')"
+                        >
+                    ` : ''}
+                    <div class="collection-grid-info">
+                        ${item.title ? `<strong style="color:#fff">${escapeHtml(item.title)}</strong>` : ''}
+                        ${item.description ? `<div style="margin-top:0.4rem">${escapeHtml(item.description)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('')
+            : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
+    } else if (type === 'blog') {
+        title.textContent = 'All Blog Posts';
+        content.className = 'collection-modal-content blog-collection-grid';
+
+        content.innerHTML = visibleItems.length
+            ? visibleItems.map(item => `
+                <div class="collection-blog-card">
+                    <div class="collection-blog-meta">
+                        ${escapeHtml(item.category || 'Blog')}
+                        ${item.post_date ? ' · ' + escapeHtml(item.post_date) : ''}
+                        ${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
+                    </div>
+                    <div class="collection-blog-title">${escapeHtml(item.title || 'Untitled')}</div>
+                    <div class="collection-blog-excerpt">${escapeHtml(item.excerpt || '')}</div>
+                    <div class="collection-blog-actions">
+                        ${item.content ? `
+                            <button class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
+                                Read Post
+                            </button>
+                        ` : ''}
+                        ${item.url ? `
+                            <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
+                                Open Link
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('')
+            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+    }
+
+    if (allItems.length > collectionRenderState.limit) {
+        content.innerHTML += `
+            <div class="collection-load-more-wrap">
+                <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
+                    Load More
+                </button>
+            </div>
+        `;
+    }
+}
 
 function initCollectionModalSwipe() {
     const panel = document.querySelector('.collection-modal-panel');
@@ -581,68 +700,6 @@ function initCollectionModalSwipe() {
             closeCollectionModal();
         }
     };
-}
-function getCollectionItems(type) {
-    if (type === 'gallery') return galleryCache || [];
-    if (type === 'designs') return designsCache || [];
-    if (type === 'blog') return blogCache || [];
-    return [];
-}
-
-function renderCollectionModalContent(type) {
-    const title = document.getElementById('collectionModalTitle');
-    const content = document.getElementById('collectionModalContent');
-    if (!title || !content) return;
-
-    const allItems = getCollectionItems(type);
-    const visibleItems = allItems.slice(0, collectionRenderState.limit);
-
-    content.className = 'collection-modal-content';
-
-    if (type === 'gallery') {
-        title.textContent = 'All Artworks';
-
-        content.innerHTML = visibleItems.map(item => `
-            <div class="collection-grid-card">
-                ${item.image_url ? `
-                    <img src="${escapeAttr(item.image_url)}"
-                         onclick="openGalleryLightbox('${escapeAttr(item.image_url)}')">
-                ` : ''}
-                <div class="collection-grid-info">
-                    <strong>${escapeHtml(item.title || '')}</strong>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    else if (type === 'designs') {
-        title.textContent = 'All Designs';
-
-        content.innerHTML = visibleItems.map(item => `
-            <div class="collection-grid-card">
-                ${item.image_url ? `
-                    <img src="${escapeAttr(item.image_url)}"
-                         onclick="openDesignLightbox('${escapeAttr(item.image_url)}')">
-                ` : ''}
-                <div class="collection-grid-info">
-                    <strong>${escapeHtml(item.title || '')}</strong>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    else if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content ios-notes-grid';
-
-        content.innerHTML = visibleItems.map(item => `
-            <div class="ios-note-card" onclick="openBlogReaderFromCollection(${item.id})">
-                <div class="ios-note-title">
-                    ${escapeHtml(item.title || 'Untitled')}
-                </div>
-            </div>
-        `).join('');
-    }
 }
 
 function openCollectionModal(type) {
@@ -696,6 +753,7 @@ function closeCollectionModal() {
         el.style.pointerEvents = '';
     });
 }
+
 // ==========================================
 // BLOG READER
 // ==========================================
@@ -711,6 +769,7 @@ function openBlogReader(id) {
     const externalEl = document.getElementById('readerModalExternal');
 
     if (titleEl) titleEl.textContent = post.title || 'Blog Post';
+
     if (metaEl) {
         const parts = [];
         if (post.category) parts.push(post.category);
@@ -718,10 +777,16 @@ function openBlogReader(id) {
         if (post.platform) parts.push(post.platform);
         metaEl.textContent = parts.join(' · ');
     }
-    if (contentEl) contentEl.innerHTML = post.content || '<p>No content available.</p>';
-    if (externalEl) externalEl.innerHTML = post.url
-        ? `<a href="${post.url}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${post.platform || 'External'} →</a>`
-        : '';
+
+    if (contentEl) {
+        contentEl.innerHTML = post.content || '<p>No content available.</p>';
+    }
+
+    if (externalEl) {
+        externalEl.innerHTML = post.url
+            ? `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${escapeHtml(post.platform || 'External')} →</a>`
+            : '';
+    }
 
     if (modal) {
         modal.style.display = 'block';
@@ -736,11 +801,6 @@ function closeBlogReader() {
     document.body.style.overflow = '';
 }
 
-function openBlogReaderFromModal(id) {
-    closeCollectionModal();
-    setTimeout(() => openBlogReader(id), 300);
-}
-
 function openBlogReaderFromCollection(id) {
     closeCollectionModal();
     setTimeout(() => openBlogReader(id), 180);
@@ -751,8 +811,324 @@ function openBlogReaderFromModal(id) {
 }
 
 // ==========================================
-// ADMIN MENU
+// LIGHTBOX
 // ==========================================
+
+function updateLightboxImage() {
+    const img = document.getElementById('lightboxImg');
+    if (!img || !lightboxImages.length) return;
+    img.src = lightboxImages[lightboxIndex] || '';
+    resetLightboxTransform();
+}
+
+function applyLightboxTransform() {
+    const img = document.getElementById('lightboxImg');
+    if (!img) return;
+    img.style.transform = `translate(${lightboxTranslateX}px, ${lightboxTranslateY}px) scale(${lightboxScale})`;
+}
+
+function resetLightboxTransform() {
+    lightboxScale = 1;
+    lightboxTranslateX = 0;
+    lightboxTranslateY = 0;
+    applyLightboxTransform();
+}
+
+function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+}
+
+function openLightbox(src, images = []) {
+    if (!src) return;
+
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+
+    if (!lightbox || !img) return;
+
+    lightboxImages = Array.isArray(images) && images.length
+        ? images.filter(Boolean)
+        : [src];
+
+    lightboxIndex = lightboxImages.indexOf(src);
+    if (lightboxIndex < 0) {
+        lightboxIndex = 0;
+        if (!lightboxImages.length) lightboxImages = [src];
+    }
+
+    updateLightboxImage();
+    lightbox.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+
+    if (lightbox) lightbox.classList.remove('active');
+    if (img) {
+        img.src = '';
+        img.style.transform = '';
+    }
+
+    lightboxImages = [];
+    lightboxIndex = 0;
+    resetLightboxTransform();
+
+    document.body.classList.remove('modal-open');
+}
+
+function showNextLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function showPrevLightboxImage() {
+    if (!lightboxImages.length) return;
+    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    updateLightboxImage();
+}
+
+function openGalleryLightbox(src) {
+    const images = galleryCache.map(item => item.image_url || '').filter(Boolean);
+    openLightbox(src, images);
+}
+
+function openDesignLightbox(src) {
+    const images = designsCache.map(item => item.image_url || '').filter(Boolean);
+    openLightbox(src, images);
+}
+
+function initLightboxSwipe() {
+    const stage = document.getElementById('lightboxStage');
+    const lightbox = document.getElementById('lightbox');
+
+    if (!stage || !lightbox || stage.dataset.swipeInit === 'true') return;
+    stage.dataset.swipeInit = 'true';
+
+    let startX = 0;
+    let startY = 0;
+    let currentY = 0;
+    let isPinching = false;
+    let isDraggingDown = false;
+
+    stage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            isPinching = true;
+            lightboxStartDistance = getTouchDistance(e.touches);
+            lightboxStartScale = lightboxScale;
+            return;
+        }
+
+        if (e.touches.length === 1) {
+            isPinching = false;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            currentY = startY;
+
+            lightboxTouchStartX = startX;
+            lightboxTouchEndX = startX;
+
+            lightboxPanStartX = startX - lightboxTranslateX;
+            lightboxPanStartY = startY - lightboxTranslateY;
+            isDraggingDown = false;
+        }
+    }, { passive: true });
+
+    stage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            isPinching = true;
+            const newDistance = getTouchDistance(e.touches);
+            if (!lightboxStartDistance) return;
+
+            lightboxScale = Math.min(4, Math.max(1, (newDistance / lightboxStartDistance) * lightboxStartScale));
+            applyLightboxTransform();
+            return;
+        }
+
+        if (e.touches.length !== 1) return;
+
+        const currentX = e.touches[0].clientX;
+        currentY = e.touches[0].clientY;
+        lightboxTouchEndX = currentX;
+
+        const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
+
+        if (lightboxScale > 1) {
+            lightboxTranslateX = currentX - lightboxPanStartX;
+            lightboxTranslateY = currentY - lightboxPanStartY;
+            applyLightboxTransform();
+            e.preventDefault();
+            return;
+        }
+
+        if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 0) {
+            isDraggingDown = true;
+            const dragAmount = Math.max(0, deltaY);
+            const progress = Math.min(dragAmount / 220, 1);
+
+            stage.style.transform = `translateY(${dragAmount}px) scale(${1 - progress * 0.08})`;
+            lightbox.style.background = `rgba(0,0,0,${0.95 - progress * 0.45})`;
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    stage.addEventListener('touchend', () => {
+        if (isPinching) {
+            isPinching = false;
+            return;
+        }
+
+        const deltaX = lightboxTouchStartX - lightboxTouchEndX;
+        const deltaY = currentY - startY;
+
+        if (lightboxScale > 1) return;
+
+        if (isDraggingDown) {
+            if (deltaY > 120) {
+                stage.style.transform = '';
+                lightbox.style.background = '';
+                closeLightbox();
+                return;
+            }
+
+            stage.style.transition = 'transform 0.22s ease';
+            lightbox.style.transition = 'background 0.22s ease';
+            stage.style.transform = '';
+            lightbox.style.background = '';
+
+            setTimeout(() => {
+                stage.style.transition = '';
+                lightbox.style.transition = '';
+            }, 220);
+
+            isDraggingDown = false;
+            return;
+        }
+
+        if (Math.abs(deltaX) > 40) {
+            if (deltaX > 0) {
+                showNextLightboxImage();
+            } else {
+                showPrevLightboxImage();
+            }
+        }
+    });
+
+    stage.addEventListener('dblclick', () => {
+        if (lightboxScale > 1) {
+            resetLightboxTransform();
+        } else {
+            lightboxScale = 2;
+            applyLightboxTransform();
+        }
+    });
+}
+
+function initLightbox() {
+    initLightboxSwipe();
+}
+
+// ==========================================
+// TOAST
+// ==========================================
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+
+    toast.textContent = msg;
+    toast.classList.add('show');
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3500);
+}
+
+// ==========================================
+// CONTACT FORM
+// ==========================================
+
+function initContactForm() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = form.querySelector('button[type="submit"]');
+        const orig = btn.innerHTML;
+        btn.innerHTML = 'Sending... ⏳';
+        btn.disabled = true;
+
+        const inputs = form.querySelectorAll('input, textarea');
+        const name = inputs[0]?.value.trim() || '';
+        const email = inputs[1]?.value.trim() || '';
+        const subject = inputs[2]?.value.trim() || '';
+        const message = inputs[3]?.value.trim() || '';
+
+        if (!name || !email || !message) {
+            showToast('⚠️ Please fill in all required fields.');
+            btn.innerHTML = orig;
+            btn.disabled = false;
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{ name, email, subject, message }]);
+
+            if (error) throw error;
+
+            showToast('✅ Message sent!');
+            form.reset();
+        } catch (err) {
+            console.error('Message error:', err);
+            showToast('❌ Failed to send. Please email directly.');
+        } finally {
+            btn.innerHTML = orig;
+            btn.disabled = false;
+        }
+    });
+}
+
+// ==========================================
+// NAVIGATION
+// ==========================================
+
+function initNav() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-links');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => navMenu?.classList.remove('open'));
+    });
+
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('section[id]');
+        let current = '';
+
+        sections.forEach(section => {
+            if (window.scrollY >= section.offsetTop - 120) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+        });
+    });
+}
 
 function initAdminMenu() {
     const adminMenuBtn = document.getElementById('adminMenuBtn');
@@ -776,9 +1152,21 @@ function initAdminMenu() {
         });
     }
 }
-/* ==========================================
-   APPLE-STYLE FLOATING GLASS NAV
-========================================== */
+
+function initModals() {
+    document.getElementById('lightbox')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeLightbox();
+    });
+
+    document.getElementById('blogReaderModal')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeBlogReader();
+    });
+}
+
+// ==========================================
+// NAVBAR SCROLL EFFECT
+// ==========================================
+
 function initNavbarScrollEffect() {
     const nav = document.querySelector('nav');
     if (!nav) return;
@@ -818,408 +1206,50 @@ function initNavbarScrollEffect() {
 
     updateNav();
 }
-/* ==========================================
-   LIGHTBOX
-========================================== */
-let lightboxImages = [];
-let lightboxIndex = 0;
 
-let lightboxScale = 1;
-let lightboxTranslateX = 0;
-let lightboxTranslateY = 0;
+// ==========================================
+// GLOBAL SUBMIT COMPAT
+// ==========================================
 
-let lightboxStartDistance = 0;
-let lightboxStartScale = 1;
-let lightboxPanStartX = 0;
-let lightboxPanStartY = 0;
-let lightboxTouchStartX = 0;
-let lightboxTouchEndX = 0;
+async function submitContactMessage(event) {
+    event.preventDefault();
 
-function updateLightboxImage() {
-    const img = document.getElementById('lightboxImg');
-    if (!img || !lightboxImages.length) return;
-    img.src = lightboxImages[lightboxIndex] || '';
-    resetLightboxTransform();
-}
+    const btn = event.target.querySelector('button');
+    const originalText = btn.innerHTML;
 
-function applyLightboxTransform() {
-    const img = document.getElementById('lightboxImg');
-    if (!img) return;
+    btn.innerHTML = 'Sending...';
+    btn.disabled = true;
 
-    img.style.transform = `translate(${lightboxTranslateX}px, ${lightboxTranslateY}px) scale(${lightboxScale})`;
-}
+    try {
+        const name = document.getElementById('contact-name')?.value.trim() || '';
+        const email = document.getElementById('contact-email')?.value.trim() || '';
+        const subject = document.getElementById('contact-subject')?.value.trim() || '';
+        const message = document.getElementById('contact-message')?.value.trim() || '';
 
-function resetLightboxTransform() {
-    lightboxScale = 1;
-    lightboxTranslateX = 0;
-    lightboxTranslateY = 0;
-    applyLightboxTransform();
-}
+        const { error } = await supabaseClient
+            .from('messages')
+            .insert([{ name, email, subject, message, is_read: false }]);
 
-function getTouchDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.hypot(dx, dy);
-}
+        if (error) throw error;
 
-function openLightbox(src, images = []) {
-    if (!src) return;
-
-    const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-
-    if (!lightbox || !img) return;
-
-    lightboxImages = Array.isArray(images) && images.length
-        ? images.filter(Boolean)
-        : [src];
-
-    lightboxIndex = lightboxImages.indexOf(src);
-    if (lightboxIndex < 0) {
-        lightboxIndex = 0;
-        if (!lightboxImages.length) {
-            lightboxImages = [src];
-        }
+        document.getElementById('contactForm')?.reset();
+        showToast('✅ Message sent successfully!');
+    } catch (err) {
+        console.error(err);
+        showToast('❌ Failed to send message');
     }
 
-    updateLightboxImage();
-    lightbox.classList.add('active');
-    document.body.classList.add('modal-open');
-}
-
-function closeLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-
-    if (lightbox) lightbox.classList.remove('active');
-    if (img) {
-        img.src = '';
-        img.style.transform = '';
-    }
-
-    lightboxImages = [];
-    lightboxIndex = 0;
-    resetLightboxTransform();
-
-    document.body.classList.remove('modal-open');
-}
-
-function showNextLightboxImage() {
-    if (!lightboxImages.length) return;
-    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
-    updateLightboxImage();
-}
-
-function showPrevLightboxImage() {
-    if (!lightboxImages.length) return;
-    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
-    updateLightboxImage();
-}
-
-function openGalleryLightbox(src) {
-    const images = galleryCache.map(i => i.image_url).filter(Boolean);
-    openLightbox(src, images);
-}
-function openDesignLightbox(src) {
-    const images = designsCache.map(i => i.image_url).filter(Boolean);
-    openLightbox(src, images);
-}
-
-function initLightboxSwipe() {
-    const stage = document.getElementById('lightboxStage');
-    const lightbox = document.getElementById('lightbox');
-
-    if (!stage || !lightbox || stage.dataset.swipeInit === 'true') return;
-    stage.dataset.swipeInit = 'true';
-
-    let startX = 0;
-    let startY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let isPinching = false;
-    let isDraggingDown = false;
-
-    stage.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            isPinching = true;
-            lightboxStartDistance = getTouchDistance(e.touches);
-            lightboxStartScale = lightboxScale;
-            return;
-        }
-
-        if (e.touches.length === 1) {
-            isPinching = false;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            currentX = startX;
-            currentY = startY;
-
-            lightboxTouchStartX = startX;
-            lightboxTouchEndX = startX;
-
-            lightboxPanStartX = startX - lightboxTranslateX;
-            lightboxPanStartY = startY - lightboxTranslateY;
-            isDraggingDown = false;
-        }
-    }, { passive: true });
-
-    stage.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-            isPinching = true;
-            const newDistance = getTouchDistance(e.touches);
-            if (!lightboxStartDistance) return;
-
-            lightboxScale = Math.min(4, Math.max(1, (newDistance / lightboxStartDistance) * lightboxStartScale));
-            applyLightboxTransform();
-            return;
-        }
-
-        if (e.touches.length !== 1) return;
-
-        currentX = e.touches[0].clientX;
-        currentY = e.touches[0].clientY;
-        lightboxTouchEndX = currentX;
-
-        const deltaX = currentX - startX;
-        const deltaY = currentY - startY;
-
-        if (lightboxScale > 1) {
-            lightboxTranslateX = currentX - lightboxPanStartX;
-            lightboxTranslateY = currentY - lightboxPanStartY;
-            applyLightboxTransform();
-            e.preventDefault();
-            return;
-        }
-
-        if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 0) {
-            isDraggingDown = true;
-
-            const dragAmount = Math.max(0, deltaY);
-            const progress = Math.min(dragAmount / 220, 1);
-
-            stage.style.transform = `translateY(${dragAmount}px) scale(${1 - progress * 0.08})`;
-            lightbox.style.background = `rgba(0,0,0,${0.95 - progress * 0.45})`;
-
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    stage.addEventListener('touchend', () => {
-        if (isPinching) {
-            isPinching = false;
-            return;
-        }
-
-        const deltaX = lightboxTouchStartX - lightboxTouchEndX;
-        const deltaY = currentY - startY;
-
-        if (lightboxScale > 1) {
-            return;
-        }
-
-        if (isDraggingDown) {
-            if (deltaY > 120) {
-                stage.style.transform = '';
-                lightbox.style.background = '';
-                closeLightbox();
-                return;
-            } else {
-                stage.style.transition = 'transform 0.22s ease';
-                lightbox.style.transition = 'background 0.22s ease';
-                stage.style.transform = '';
-                lightbox.style.background = '';
-
-                setTimeout(() => {
-                    stage.style.transition = '';
-                    lightbox.style.transition = '';
-                }, 220);
-            }
-        } else if (Math.abs(deltaX) > 40) {
-            if (deltaX > 0) {
-                showNextLightboxImage();
-            } else {
-                showPrevLightboxImage();
-            }
-        }
-
-        isDraggingDown = false;
-    });
-
-    stage.addEventListener('dblclick', () => {
-        if (lightboxScale > 1) {
-            resetLightboxTransform();
-        } else {
-            lightboxScale = 2;
-            applyLightboxTransform();
-        }
-    });
-}
-
-function initLightbox() {
-    initLightboxSwipe();
+    btn.innerHTML = originalText;
+    btn.disabled = false;
 }
 
 // ==========================================
-// CONTACT FORM
+// INIT
 // ==========================================
 
-function initContactForm() {
-    const contactForm = document.getElementById('contactForm');
-    if (!contactForm) return;
-
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const btn = contactForm.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Sending... ⏳';
-        btn.disabled = true;
-
-        const inputs = contactForm.querySelectorAll('input, textarea');
-        const name = inputs[0]?.value.trim() || '';
-        const email = inputs[1]?.value.trim() || '';
-        const subject = inputs[2]?.value.trim() || '';
-        const message = inputs[3]?.value.trim() || '';
-
-        if (!name || !email || !message) {
-            showToast('⚠️ Please fill in all required fields.');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            return;
-        }
-
-        try {
-            const { error } = await supabaseClient
-                .from('messages')
-                .insert([{ name, email, subject, message }]);
-
-            if (error) throw error;
-
-            showToast('✅ Message sent! I will get back to you soon.');
-            contactForm.reset();
-
-        } catch (err) {
-            console.error('Message error:', err);
-            showToast('❌ Failed to send. Please email directly.');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
-    });
-}
-
-// ==========================================
-// TOAST
-// ==========================================
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-// ==========================================
-// NAVIGATION
-// ==========================================
-
-function initNav() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-links');
-    const navLinks = document.querySelectorAll('.nav-links a');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
-    }
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => navMenu?.classList.remove('open'));
-    });
-
-    window.addEventListener('scroll', () => {
-        const sections = document.querySelectorAll('section[id]');
-        let current = '';
-        sections.forEach(s => {
-            if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
-        });
-        navLinks.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === '#' + current);
-        });
-    });
-}
-
-function initAdminMenu() {
-    const btn = document.getElementById('adminMenuBtn');
-    const dropdown = document.getElementById('adminDropdown');
-    const openBtn = document.getElementById('openAdminBtn');
-
-    if (btn && dropdown) {
-        btn.addEventListener('click', e => {
-            e.stopPropagation();
-            dropdown.classList.toggle('open');
-        });
-        document.addEventListener('click', () => dropdown.classList.remove('open'));
-    }
-    if (openBtn) {
-        openBtn.addEventListener('click', () =>
-            window.open('https://manojm9894.github.io/portfolio-site/admin.html', '_blank', 'noopener,noreferrer'));
-    }
-}
-
-function initModals() {
-    document.getElementById('lightbox')?.addEventListener('click', e => {
-        if (e.target === e.currentTarget) closeLightbox();
-    });
-    document.getElementById('blogReaderModal')?.addEventListener('click', e => {
-        if (e.target === e.currentTarget) closeBlogReader();
-    });
-}
-
-function initContactForm() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
-        const orig = btn.innerHTML;
-        btn.innerHTML = 'Sending... ⏳';
-        btn.disabled = true;
-        const inputs = form.querySelectorAll('input, textarea');
-        const name = inputs[0]?.value.trim() || '';
-        const email = inputs[1]?.value.trim() || '';
-        const subject = inputs[2]?.value.trim() || '';
-        const message = inputs[3]?.value.trim() || '';
-        if (!name || !email || !message) {
-            showToast('⚠️ Please fill in all required fields.');
-            btn.innerHTML = orig;
-            btn.disabled = false;
-            return;
-        }
-        try {
-            const { error } = await supabaseClient.from('messages').insert([{ name, email, subject, message }]);
-            if (error) throw error;
-            showToast('✅ Message sent!');
-            form.reset();
-        } catch (err) {
-            showToast('❌ Failed to send. Please email directly.');
-        } finally {
-            btn.innerHTML = orig;
-            btn.disabled = false;
-        }
-    });
-}
-function initLightbox() {
-    initLightboxSwipe();
-    const blogModal = document.getElementById('blogReaderModal');
-    if (blogModal) {
-        blogModal.addEventListener('click', (e) => {
-            if (e.target === blogModal) closeBlogReader();
-        });
-    }
-}
 document.addEventListener('DOMContentLoaded', async () => {
     initNavbarScrollEffect();
+
     try {
         await renderGallery();
         await renderDesigns();
@@ -1233,55 +1263,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     initNav();
     initAdminMenu();
     initLightbox();
+    initModals();
     initContactForm();
 });
-async function submitContactMessage(event) {
-    event.preventDefault();
-
-    const btn = event.target.querySelector('button');
-    const originalText = btn.innerHTML;
-
-    btn.innerHTML = 'Sending...';
-    btn.disabled = true;
-
-    try {
-        const name = document.getElementById('contact-name').value.trim();
-        const email = document.getElementById('contact-email').value.trim();
-        const subject = document.getElementById('contact-subject').value.trim();
-        const message = document.getElementById('contact-message').value.trim();
-
-        const { error } = await supabaseClient
-            .from('messages')
-            .insert([{ name, email, subject, message, is_read: false }]);
-
-        if (error) throw error;
-
-        document.getElementById('contactForm').reset();
-        showToast('✅ Message sent successfully!');
-    } catch (err) {
-        console.error(err);
-        showToast('❌ Failed to send message');
-    }
-
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-}
 
 // ==========================================
 // GLOBALS
 // ==========================================
+
 window.openLightbox = openLightbox;
-window.closeLightbox = closeLightbox;
-window.openBlogReader = openBlogReader;
-window.closeBlogReader = closeBlogReader;
-window.openCollectionModal = openCollectionModal;
-window.closeCollectionModal = closeCollectionModal;
-window.openBlogReaderFromModal = openBlogReaderFromModal;
-window.submitContactMessage = submitContactMessage;
 window.closeLightbox = closeLightbox;
 window.showNextLightboxImage = showNextLightboxImage;
 window.showPrevLightboxImage = showPrevLightboxImage;
-window.openBlogReaderFromCollection = openBlogReaderFromCollection;
-window.initLightboxSwipe = initLightboxSwipe;
 window.openGalleryLightbox = openGalleryLightbox;
 window.openDesignLightbox = openDesignLightbox;
+
+window.openBlogReader = openBlogReader;
+window.closeBlogReader = closeBlogReader;
+window.openBlogReaderFromCollection = openBlogReaderFromCollection;
+window.openBlogReaderFromModal = openBlogReaderFromModal;
+
+window.openCollectionModal = openCollectionModal;
+window.closeCollectionModal = closeCollectionModal;
+window.loadMoreCollectionItems = loadMoreCollectionItems;
+
+window.submitContactMessage = submitContactMessage;

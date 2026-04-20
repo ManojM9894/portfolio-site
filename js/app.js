@@ -859,7 +859,6 @@ function closeLightbox() {
         img.style.transform = '';
     }
 
-    lightboxImages = [];
     lightboxIndex = 0;
     resetLightboxTransform();
 

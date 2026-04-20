@@ -374,7 +374,7 @@ async function renderGallery() {
         }
 
         const repeated = [...items, ...items, ...items];
-
+        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -421,7 +421,7 @@ async function renderDesigns() {
         }
 
         const repeated = [...items, ...items, ...items];
-
+        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">

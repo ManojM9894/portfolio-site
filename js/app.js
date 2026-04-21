@@ -679,78 +679,119 @@ function renderCollectionModalContent(type) {
 
         return;
     }
+if (type === 'blog') {
+    title.textContent = 'All Blog Posts';
+    content.className = 'collection-modal-content blog-collection-grid';
 
-    if (type === 'blog') {
-        title.textContent = 'All Blog Posts';
-        content.className = 'collection-modal-content blog-collection-grid';
+    content.innerHTML = visibleItems.length
+        ? `
+            ${visibleItems.map(item => `
+                <div
+                    class="collection-blog-card"
+                    role="button"
+                    tabindex="0"
+                    onclick="${item.content
+                        ? `openBlogReaderFromCollection(${item.id})`
+                        : (item.url
+                            ? `window.open('${escapeAttr(item.url)}','_blank','noopener,noreferrer')`
+                            : '')}"
+                    onkeydown="if(event.key==='Enter' || event.key===' '){ event.preventDefault(); this.click(); }"
+                >
+                    <div class="collection-blog-title">
+                        ${escapeHtml(item.title || 'Untitled')}
+                    </div>
 
-        content.innerHTML = visibleItems.length
-            ? `
-                ${visibleItems.map(item => `
-                    <div class="collection-blog-card">
-                        <div class="collection-blog-meta">
-                            ${escapeHtml(item.category || '')}${item.category ? ' · ' : ''}${escapeHtml(item.post_date || '')}${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
+                    <div class="collection-blog-meta">
+                        ${escapeHtml(item.category || '')}${item.category ? ' · ' : ''}${escapeHtml(item.post_date || '')}${item.platform ? ' · ' + escapeHtml(item.platform) : ''}
+                    </div>
+
+                    ${item.excerpt ? `
+                        <div class="collection-blog-excerpt">
+                            ${escapeHtml(item.excerpt)}
                         </div>
+                    ` : ''}
 
-                        <div class="collection-blog-title">
-                            ${escapeHtml(item.title || 'Untitled')}
-                        </div>
-
-                        ${item.excerpt ? `
-                            <div class="collection-blog-excerpt">
-                                ${escapeHtml(item.excerpt)}
-                            </div>
+                    <div class="collection-blog-actions" onclick="event.stopPropagation()">
+                        ${item.content ? `
+                            <button
+                                type="button"
+                                class="collection-blog-btn"
+                                onclick="openBlogReaderFromCollection(${item.id})"
+                            >
+                                Read Post
+                            </button>
                         ` : ''}
 
-                        <div class="collection-blog-actions">
-                            ${item.content ? `
-                                <button type="button" class="collection-blog-btn" onclick="openBlogReaderFromCollection(${item.id})">
-                                    Read Post
-                                </button>
-                            ` : ''}
-                            ${item.url ? `
-                                <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
-                                    Open Link
-                                </a>
-                            ` : ''}
-                        </div>
+                        ${item.url ? `
+                            <a
+                                class="collection-blog-btn"
+                                href="${escapeAttr(item.url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Open Link
+                            </a>
+                        ` : ''}
                     </div>
-                `).join('')}
-                ${hasMore ? `
-                    <div class="collection-load-more-wrap">
-                        <button type="button" class="collection-load-more-btn" onclick="loadMoreCollectionItems()">
-                            Load More
-                        </button>
-                    </div>
-                ` : ''}
-            `
-            : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
-    }
+                </div>
+            `).join('')}
+
+            ${hasMore ? `
+                <div class="collection-load-more-wrap">
+                    <button
+                        type="button"
+                        class="collection-load-more-btn"
+                        onclick="loadMoreCollectionItems()"
+                    >
+                        Load More
+                    </button>
+                </div>
+            ` : ''}
+        `
+        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+
+    return;
+}
 }
 
 function initCollectionModalSwipe() {
     const panel = document.querySelector('.collection-modal-panel');
-    if (!panel || panel.dataset.swipeInit === 'true') return;
+    const content = document.getElementById('collectionModalContent');
+
+    if (!panel || !content || panel.dataset.swipeInit === 'true') return;
 
     panel.dataset.swipeInit = 'true';
 
-    panel.ontouchstart = (e) => {
-        if (!e.touches[0]) return;
-        collectionTouchStartY = e.touches[0].clientY;
-        collectionTouchEndY = e.touches[0].clientY;
-    };
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
 
-    panel.ontouchmove = (e) => {
+    panel.addEventListener('touchstart', (e) => {
         if (!e.touches[0]) return;
-        collectionTouchEndY = e.touches[0].clientY;
-    };
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        endX = startX;
+        endY = startY;
+    }, { passive: true });
 
-    panel.ontouchend = () => {
-        const deltaY = collectionTouchEndY - collectionTouchStartY;
-        if (deltaY > 80) {
+    panel.addEventListener('touchmove', (e) => {
+        if (!e.touches[0]) return;
+        endX = e.touches[0].clientX;
+        endY = e.touches[0].clientY;
+    }, { passive: true });
+
+    panel.addEventListener('touchend', () => {
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+        const isAtTop = content.scrollTop <= 0;
+        const isMostlyVertical = Math.abs(deltaY) > Math.abs(deltaX);
+        const isSwipeDown = deltaY > 90;
+
+        if (window.innerWidth <= 768 && isAtTop && isMostlyVertical && isSwipeDown) {
             closeCollectionModal();
         }
-    };
+    });
 }
 
 function openCollectionModal(type) {

@@ -3884,10 +3884,9 @@ MOBILE BLOG POPUP FIX
 }
 /* ==========================================
    FINAL MODAL + LIGHTBOX OVERRIDES
-   Keep this as the LAST block in style.css
+   KEEP THIS LAST
 ========================================== */
 
-/* collection modal desktop */
 .collection-modal-panel {
     width: min(1180px, calc(100% - 32px)) !important;
     height: min(88vh, 920px) !important;
@@ -3910,7 +3909,6 @@ MOBILE BLOG POPUP FIX
     align-content: start !important;
 }
 
-/* blog popup desktop */
 .collection-modal-content.blog-collection-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
 }
@@ -3975,7 +3973,6 @@ MOBILE BLOG POPUP FIX
     cursor: pointer !important;
 }
 
-/* load more */
 .collection-load-more-wrap {
     grid-column: 1 / -1 !important;
     display: flex !important;
@@ -3997,7 +3994,6 @@ MOBILE BLOG POPUP FIX
     text-transform: uppercase !important;
 }
 
-/* lightbox */
 .lightbox {
     display: none;
     align-items: center;
@@ -4097,7 +4093,6 @@ MOBILE BLOG POPUP FIX
     cursor: pointer !important;
 }
 
-/* mobile */
 @media (max-width: 768px) {
     .collection-modal-panel {
         width: calc(100% - 12px) !important;
@@ -4106,7 +4101,6 @@ MOBILE BLOG POPUP FIX
         border-radius: 14px !important;
     }
 
-    /* blog popup = single column, titles visible */
     #collectionModalContent.blog-collection-grid {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
@@ -4142,7 +4136,6 @@ MOBILE BLOG POPUP FIX
         width: 100% !important;
     }
 
-    /* gallery + designs = 2 columns */
     #collectionModalContent:not(.blog-collection-grid) {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 8px !important;
@@ -4189,7 +4182,6 @@ MOBILE BLOG POPUP FIX
         display: none !important;
     }
 
-    /* mobile lightbox */
     .lightbox {
         padding: 54px 0 16px !important;
     }

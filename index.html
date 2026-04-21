@@ -15,16 +15,17 @@
 <body>
     <!-- FULL PAGE INFINITY WATERMARK -->
     <div style="
-    position:fixed;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    background-image: url('./assets/infinity-bg.png');
-    background-size: 140%;
-    background-position: center center;
-    background-repeat: repeat;
-    opacity: 0.4;
-    mix-blend-mode: screen;"></div>
+        position:fixed;
+        inset:0;
+        z-index:0;
+        pointer-events:none;
+        background-image: url('./assets/infinity-bg.png');
+        background-size: 140%;
+        background-position: center center;
+        background-repeat: repeat;
+        opacity: 0.4;
+        mix-blend-mode: screen;"></div>
+
     <!-- NAVBAR -->
     <nav>
         <a href="#home" class="nav-logo">MM</a>
@@ -131,16 +132,14 @@
     </section>
 
     <!-- BLOG READER SECTION -->
-    <section id="blogReader" style="display:none;visibility:hidden;height:0;overflow:hidden;padding:0;margin:0;">
-    </section>
+    <section id="blogReader" style="display:none;visibility:hidden;height:0;overflow:hidden;padding:0;margin:0;"></section>
 
-    <!-- BLOG READER MODAL (outside hidden section) -->
+    <!-- BLOG READER MODAL -->
     <div id="blogReaderModal"
         style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);overflow-y:auto;padding:2rem 1rem;">
         <div
             style="max-width:780px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;position:relative;">
 
-            <!-- Header -->
             <div
                 style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;">
                 <div style="display:flex;align-items:center;gap:0.8rem">
@@ -153,7 +152,6 @@
                     onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">✕</button>
             </div>
 
-            <!-- Content -->
             <div style="padding:2rem 1.5rem;">
                 <h1 id="readerModalTitle"
                     style="font-size:1.8rem;font-weight:800;margin-bottom:1.5rem;color:var(--text-primary);line-height:1.2">
@@ -162,25 +160,8 @@
                 <div id="readerModalExternal"
                     style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)"></div>
             </div>
-
         </div>
     </div>
-
-    <!-- Modal Content -->
-    <!-- Modal Content -->
-<div style="padding:2rem 1.5rem;">
-    <h1 id="readerModalTitle"
-        style="font-size:1.8rem;font-weight:800;margin-bottom:1rem;color:var(--text-primary);line-height:1.2">
-    </h1>
-    <div id="readerModalContent" style="color:var(--text-secondary);line-height:1.8;font-size:1rem;">
-    </div>
-    <div id="readerModalExternal" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-    </div>
-</div>
-
-    </div>
-    </div>
-    </section>
 
     <!-- GITHUB -->
     <section id="github">
@@ -226,8 +207,6 @@
     <!-- CONTACT -->
     <section id="contact">
         <div class="contact-grid premium-contact-grid">
-
-            <!-- LEFT: Connect Social Links -->
             <div class="contact-card premium-contact-card">
                 <div class="contact-card-top">
                     <div class="contact-icon-badge">
@@ -267,7 +246,6 @@
                     </a>
                 </div>
 
-                <!-- Email button at bottom -->
                 <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
                     <a href="https://mail.google.com/mail/?view=cm&to=manojmandava@proton.me" target="_blank"
                         class="premium-email-btn" style="width:100%;justify-content:center">
@@ -277,7 +255,6 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Contact Form -->
             <div class="contact-card premium-contact-card">
                 <div class="contact-card-top">
                     <div class="contact-icon-badge">
@@ -315,7 +292,6 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </section>
 
@@ -333,20 +309,20 @@
         </div>
     </div>
 
-  <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-    <button class="lightbox-close" type="button" onclick="closeLightbox()">✕</button>
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" type="button" onclick="closeLightbox()">✕</button>
 
-    <div class="lightbox-content">
-        <button class="lightbox-nav lightbox-prev" type="button" onclick="showPrevLightboxImage()">‹</button>
+        <div class="lightbox-content">
+            <button class="lightbox-nav lightbox-prev" type="button" onclick="showPrevLightboxImage()">‹</button>
 
-        <div class="lightbox-stage" id="lightboxStage">
-            <img id="lightboxImg" src="" alt="Preview" />
+            <div class="lightbox-stage" id="lightboxStage">
+                <img id="lightboxImg" src="" alt="Preview" />
+            </div>
+
+            <button class="lightbox-nav lightbox-next" type="button" onclick="showNextLightboxImage()">›</button>
         </div>
-
-        <button class="lightbox-nav lightbox-next" type="button" onclick="showNextLightboxImage()">›</button>
     </div>
-</div>
 
     <!-- TOAST -->
     <div id="toast" class="toast"></div>

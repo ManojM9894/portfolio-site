@@ -374,7 +374,6 @@ async function renderGallery() {
         }
 
         const repeated = [...items, ...items, ...items];
-        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -421,7 +420,6 @@ async function renderDesigns() {
         }
 
         const repeated = [...items, ...items, ...items];
-        lightboxImages = items.map(i => i.image_url).filter(Boolean);
         container.innerHTML = `
             <div class="carousel-shell">
                 <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${items.length}">
@@ -539,16 +537,17 @@ function renderRecentWorks() {
                     ${loopItems.map(item => {
 
                         if (item.type === 'blog') {
-                         const blogColors = {
-    'story':    ['#1a0800', '#7c2d00'],
-    'thoughts': ['#1a0a00', '#92400e'],
-    'tech':     ['#150800', '#6b2a00'],
-    'art':      ['#1a0800', '#9a3412'],
-    'life':     ['#120800', '#7c2d00'],
-    'default':  ['#120600', '#6b2100']
-};
+                            const blogColors = {
+                                story: ['#1a0800', '#7c2d00'],
+                                thoughts: ['#1a0a00', '#92400e'],
+                                tech: ['#150800', '#6b2a00'],
+                                art: ['#1a0800', '#9a3412'],
+                                life: ['#120800', '#7c2d00'],
+                                default: ['#120600', '#6b2100']
+                            };
                             const cat = item.category?.toLowerCase() || 'default';
                             const [c1, c2] = blogColors[cat] || blogColors.default;
+
                             return `
                                 <div class="recent-work-card">
                                     <div class="recent-work-image" onclick="openBlogReader(${item.id})"
@@ -594,6 +593,13 @@ function renderRecentWorks() {
 // ==========================================
 // COLLECTION MODAL
 // ==========================================
+
+function getCollectionItems(type) {
+    if (type === 'gallery') return galleryCache || [];
+    if (type === 'designs') return designsCache || [];
+    if (type === 'blog') return blogCache || [];
+    return [];
+}
 
 function renderCollectionModalContent(type) {
     const title = document.getElementById('collectionModalTitle');
@@ -721,6 +727,85 @@ function renderCollectionModalContent(type) {
             : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
     }
 }
+
+function initCollectionModalSwipe() {
+    const panel = document.querySelector('.collection-modal-panel');
+    if (!panel || panel.dataset.swipeInit === 'true') return;
+
+    panel.dataset.swipeInit = 'true';
+
+    panel.ontouchstart = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchStartY = e.touches[0].clientY;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
+
+    panel.ontouchmove = (e) => {
+        if (!e.touches[0]) return;
+        collectionTouchEndY = e.touches[0].clientY;
+    };
+
+    panel.ontouchend = () => {
+        const deltaY = collectionTouchEndY - collectionTouchStartY;
+        if (deltaY > 80) {
+            closeCollectionModal();
+        }
+    };
+}
+
+function openCollectionModal(type) {
+    const modal = document.getElementById('collectionModal');
+    const title = document.getElementById('collectionModalTitle');
+    const content = document.getElementById('collectionModalContent');
+
+    if (!modal || !title || !content) {
+        console.error('Collection modal elements not found');
+        return;
+    }
+
+    collectionRenderState.type = type;
+    collectionRenderState.limit = 20;
+
+    renderCollectionModalContent(type);
+    content.scrollTop = 0;
+    initCollectionModalSwipe();
+
+    modal.classList.add('open');
+    document.body.classList.add('modal-open');
+
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = 'none';
+    });
+}
+
+function loadMoreCollectionItems() {
+    if (!collectionRenderState.type) return;
+    collectionRenderState.limit += 20;
+    renderCollectionModalContent(collectionRenderState.type);
+}
+
+function closeCollectionModal() {
+    const modal = document.getElementById('collectionModal');
+    const content = document.getElementById('collectionModalContent');
+
+    if (modal) modal.classList.remove('open');
+
+    if (content) {
+        content.innerHTML = '';
+        content.scrollTop = 0;
+        content.className = 'collection-modal-content';
+    }
+
+    collectionRenderState.type = '';
+    collectionRenderState.limit = 20;
+
+    document.body.classList.remove('modal-open');
+
+    document.querySelectorAll('.center-carousel').forEach(el => {
+        el.style.pointerEvents = '';
+    });
+}
+
 // ==========================================
 // BLOG READER
 // ==========================================
@@ -783,8 +868,16 @@ function openBlogReaderFromModal(id) {
 
 function updateLightboxImage() {
     const img = document.getElementById('lightboxImg');
+    const stage = document.getElementById('lightboxStage');
+    const lightbox = document.getElementById('lightbox');
+
     if (!img || !lightboxImages.length) return;
+
     img.src = lightboxImages[lightboxIndex] || '';
+
+    if (stage) stage.style.transform = '';
+    if (lightbox) lightbox.style.background = '';
+
     resetLightboxTransform();
 }
 
@@ -833,6 +926,7 @@ function openLightbox(src, images = []) {
     lightbox.classList.add('active');
     document.body.classList.add('modal-open');
 }
+
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
     const img = document.getElementById('lightboxImg');
@@ -1018,30 +1112,7 @@ function initLightboxSwipe() {
 function initLightbox() {
     initLightboxSwipe();
 }
-function openCollectionModal(type) {
-    const modal = document.getElementById('collectionModal');
-    const title = document.getElementById('collectionModalTitle');
-    const content = document.getElementById('collectionModalContent');
 
-    if (!modal || !title || !content) {
-        console.error('Collection modal elements not found');
-        return;
-    }
-
-    collectionRenderState.type = type;
-    collectionRenderState.limit = 20;
-
-    renderCollectionModalContent(type);
-    content.scrollTop = 0;
-    initCollectionModalSwipe();
-
-    modal.classList.add('open');
-    document.body.classList.add('modal-open');
-
-    document.querySelectorAll('.center-carousel').forEach(el => {
-        el.style.pointerEvents = 'none';
-    });
-}
 // ==========================================
 // TOAST
 // ==========================================
@@ -1282,8 +1353,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.openLightbox = openLightbox;
 window.closeLightbox = closeLightbox;
-window.goToPrev = showPrevLightboxImage;
-window.goToNext = showNextLightboxImage;
+window.showNextLightboxImage = showNextLightboxImage;
+window.showPrevLightboxImage = showPrevLightboxImage;
 window.openGalleryLightbox = openGalleryLightbox;
 window.openDesignLightbox = openDesignLightbox;
 
@@ -1292,26 +1363,10 @@ window.closeBlogReader = closeBlogReader;
 window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
 
-
 window.openCollectionModal = openCollectionModal;
 window.closeCollectionModal = closeCollectionModal;
 window.loadMoreCollectionItems = loadMoreCollectionItems;
 
 window.submitContactMessage = submitContactMessage;
-window.goToPrev = () => {
-    const idx = lightboxIndex <= 0 ? lightboxImages.length - 1 : lightboxIndex - 1;
-    const lb = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-    lightboxIndex = idx;
-    img.style.opacity = '0';
-    setTimeout(() => { img.src = lightboxImages[lightboxIndex]; img.style.opacity = '1'; }, 180);
-};
-
-window.goToNext = () => {
-    const idx = lightboxIndex >= lightboxImages.length - 1 ? 0 : lightboxIndex + 1;
-    const lb = document.getElementById('lightbox');
-    const img = document.getElementById('lightboxImg');
-    lightboxIndex = idx;
-    img.style.opacity = '0';
-    setTimeout(() => { img.src = lightboxImages[lightboxIndex]; img.style.opacity = '1'; }, 180);
-};
+window.goToPrev = showPrevLightboxImage;
+window.goToNext = showNextLightboxImage;

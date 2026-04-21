@@ -537,13 +537,32 @@ function renderRecentWorks() {
             <div class="carousel-wrap center-carousel infinite-carousel" data-original-count="${merged.length}">
                 <div class="recent-works-track">
                     ${loopItems.map(item => {
+
                         if (item.type === 'blog') {
+                            const blogColors = {
+                                'story':    ['#1a0530', '#4c1d95'],
+                                'thoughts': ['#0a1628', '#1e3a8a'],
+                                'tech':     ['#0a2010', '#14532d'],
+                                'art':      ['#2a0a0a', '#7f1d1d'],
+                                'life':     ['#1a1200', '#78350f'],
+                                'default':  ['#0d0d0d', '#1f2937']
+                            };
+                            const cat = item.category?.toLowerCase() || 'default';
+                            const [c1, c2] = blogColors[cat] || blogColors.default;
                             return `
                                 <div class="recent-work-card">
-                                    <div class="recent-work-image"
-                                        style="display:flex;align-items:flex-end;padding:1rem;background:var(--surface);cursor:pointer"
-                                        onclick="openBlogReader(${item.id})">
-                                        ${item.title ? `<div class="image-title-overlay"><span>${escapeHtml(item.title)}</span></div>` : ''}
+                                    <div class="recent-work-image" onclick="openBlogReader(${item.id})"
+                                        style="cursor:pointer;background:linear-gradient(135deg,${c1} 0%,${c2} 100%);display:flex;flex-direction:column;justify-content:space-between;padding:1.2rem;position:relative;overflow:hidden;">
+                                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8rem;font-weight:900;color:rgba(255,255,255,0.04);pointer-events:none;line-height:1;letter-spacing:-0.05em;user-select:none;">M</div>
+                                        <div style="display:flex;justify-content:space-between;align-items:center;z-index:1;">
+                                            <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.45);font-weight:600;">${escapeHtml(item.category || 'writing')}</span>
+                                            <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);">${item.post_date || ''}</span>
+                                        </div>
+                                        <div style="z-index:1;">
+                                            <div style="font-size:1rem;font-weight:700;color:#fff;line-height:1.3;letter-spacing:-0.02em;margin-bottom:0.4rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(item.title || '')}</div>
+                                            ${item.excerpt ? `<div style="font-size:0.75rem;color:rgba(255,255,255,0.45);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(item.excerpt)}</div>` : ''}
+                                            <div style="margin-top:0.8rem;font-size:0.7rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;">Read →</div>
+                                        </div>
                                     </div>
                                 </div>
                             `;
@@ -653,14 +672,14 @@ function renderCollectionModalContent(type) {
                         </button>
                     ` : ''}
                     ${item.url ? `
-                        <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank">
+                        <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
                             Open Link
                         </a>
                     ` : ''}
                 </div>
             </div>
         `).join('')
-        : `<p>No blog posts</p>`;
+        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
 }
 }
 function initCollectionModalSwipe() {

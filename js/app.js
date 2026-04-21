@@ -753,7 +753,6 @@ if (type === 'blog') {
     return;
 }
 }
-
 function initCollectionModalSwipe() {
     const panel = document.querySelector('.collection-modal-panel');
     const content = document.getElementById('collectionModalContent');
@@ -895,6 +894,29 @@ function closeCollectionModal() {
 // }
 let blogReaderOpenedFromCollection = false;
 
+async function shareBlogPost(id) {
+    const post = blogCache.find(item => Number(item.id) === Number(id));
+    if (!post) return;
+
+    const shareData = {
+        title: post.title || 'Blog Post',
+        text: post.excerpt || post.title || 'Check out this post',
+        url: post.url || window.location.href
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+            return;
+        }
+
+        await navigator.clipboard.writeText(shareData.url);
+        showToast('🔗 Link copied');
+    } catch (error) {
+        console.error('Share failed:', error);
+    }
+}
+
 function openBlogReader(id, options = {}) {
     const post = blogCache.find(item => Number(item.id) === Number(id));
     if (!post) return;
@@ -928,12 +950,20 @@ function openBlogReader(id, options = {}) {
                     type="button"
                     class="btn-ghost reader-share-btn"
                     onclick="shareBlogPost(${post.id})"
+                    aria-label="Share post"
+                    title="Share post"
                 >
-                    Share ↗
+                    <span aria-hidden="true">↗</span>
                 </button>
 
                 ${post.url
-                    ? `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener" class="btn-ghost">Also on ${escapeHtml(post.platform || 'External')} →</a>`
+                    ? `<a
+                        href="${escapeAttr(post.url)}"
+                        target="_blank"
+                        rel="noopener"
+                        class="btn-ghost"
+                        style="font-size:0.85rem"
+                    >Also on ${escapeHtml(post.platform || 'External')} →</a>`
                     : ''
                 }
             </div>
@@ -943,15 +973,25 @@ function openBlogReader(id, options = {}) {
     if (modal) {
         modal.style.display = 'block';
         modal.scrollTop = 0;
+        modal.dataset.fromCollection = blogReaderOpenedFromCollection ? 'true' : 'false';
         document.body.style.overflow = 'hidden';
     }
 }
+
 function closeBlogReader() {
     const modal = document.getElementById('blogReaderModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.style.display = 'none';
+    }
 
     if (blogReaderOpenedFromCollection) {
+        document.body.style.overflow = 'hidden';
         document.body.classList.add('modal-open');
+
+        const collectionModal = document.getElementById('collectionModal');
+        if (collectionModal) {
+            collectionModal.classList.add('open');
+        }
     } else {
         document.body.style.overflow = '';
         document.body.classList.remove('modal-open');
@@ -959,34 +999,19 @@ function closeBlogReader() {
 
     blogReaderOpenedFromCollection = false;
 }
+
 function openBlogReaderFromCollection(id) {
-    closeCollectionModal();
-    setTimeout(() => openBlogReader(id), 180);
+    const collectionModal = document.getElementById('collectionModal');
+    if (collectionModal) {
+        collectionModal.classList.add('open');
+    }
+
+    document.body.classList.add('modal-open');
+    openBlogReader(id, { fromCollection: true });
 }
 
 function openBlogReaderFromModal(id) {
-    openBlogReaderFromCollection(id);
-}
-async function shareBlogPost(id) {
-    const post = blogCache.find(item => Number(item.id) === Number(id));
-    if (!post) return;
-
-    const shareData = {
-        title: post.title || 'Blog Post',
-        text: post.excerpt || post.title,
-        url: post.url || window.location.href
-    };
-
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await navigator.clipboard.writeText(shareData.url);
-            showToast('Link copied!');
-        }
-    } catch (err) {
-        console.error(err);
-    }
+    openBlogReader(id);
 }
 // ==========================================
 // LIGHTBOX

@@ -539,14 +539,14 @@ function renderRecentWorks() {
                     ${loopItems.map(item => {
 
                         if (item.type === 'blog') {
-                            const blogColors = {
-                                'story':    ['#1a0530', '#4c1d95'],
-                                'thoughts': ['#0a1628', '#1e3a8a'],
-                                'tech':     ['#0a2010', '#14532d'],
-                                'art':      ['#2a0a0a', '#7f1d1d'],
-                                'life':     ['#1a1200', '#78350f'],
-                                'default':  ['#0d0d0d', '#1f2937']
-                            };
+                         const blogColors = {
+    'story':    ['#1a0800', '#7c2d00'],
+    'thoughts': ['#1a0a00', '#92400e'],
+    'tech':     ['#150800', '#6b2a00'],
+    'art':      ['#1a0800', '#9a3412'],
+    'life':     ['#120800', '#7c2d00'],
+    'default':  ['#120600', '#6b2100']
+};
                             const cat = item.category?.toLowerCase() || 'default';
                             const [c1, c2] = blogColors[cat] || blogColors.default;
                             return `

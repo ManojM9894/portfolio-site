@@ -851,9 +851,55 @@ function closeCollectionModal() {
 // BLOG READER
 // ==========================================
 
-function openBlogReader(id) {
+// function openBlogReader(id) {
+//     const post = blogCache.find(item => Number(item.id) === Number(id));
+//     if (!post) return;
+
+//     const modal = document.getElementById('blogReaderModal');
+//     const titleEl = document.getElementById('readerModalTitle');
+//     const metaEl = document.getElementById('readerModalMeta');
+//     const contentEl = document.getElementById('readerModalContent');
+//     const externalEl = document.getElementById('readerModalExternal');
+
+//     if (titleEl) titleEl.textContent = post.title || 'Blog Post';
+
+//     if (metaEl) {
+//         const parts = [];
+//         if (post.category) parts.push(post.category);
+//         if (post.post_date) parts.push(post.post_date);
+//         if (post.platform) parts.push(post.platform);
+//         metaEl.textContent = parts.join(' · ');
+//     }
+
+//     if (contentEl) {
+//         contentEl.innerHTML = post.content || '<p>No content available.</p>';
+//     }
+
+//     if (externalEl) {
+//         externalEl.innerHTML = post.url
+//             ? `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${escapeHtml(post.platform || 'External')} →</a>`
+//             : '';
+//     }
+
+//     if (modal) {
+//         modal.style.display = 'block';
+//         modal.scrollTop = 0;
+//         document.body.style.overflow = 'hidden';
+//     }
+// }
+
+// function closeBlogReader() {
+//     const modal = document.getElementById('blogReaderModal');
+//     if (modal) modal.style.display = 'none';
+//     document.body.style.overflow = '';
+// }
+let blogReaderOpenedFromCollection = false;
+
+function openBlogReader(id, options = {}) {
     const post = blogCache.find(item => Number(item.id) === Number(id));
     if (!post) return;
+
+    blogReaderOpenedFromCollection = Boolean(options.fromCollection);
 
     const modal = document.getElementById('blogReaderModal');
     const titleEl = document.getElementById('readerModalTitle');
@@ -876,9 +922,22 @@ function openBlogReader(id) {
     }
 
     if (externalEl) {
-        externalEl.innerHTML = post.url
-            ? `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener" class="btn-ghost" style="font-size:0.85rem">Also on ${escapeHtml(post.platform || 'External')} →</a>`
-            : '';
+        externalEl.innerHTML = `
+            <div class="reader-modal-footer-actions">
+                <button
+                    type="button"
+                    class="btn-ghost reader-share-btn"
+                    onclick="shareBlogPost(${post.id})"
+                >
+                    Share ↗
+                </button>
+
+                ${post.url
+                    ? `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener" class="btn-ghost">Also on ${escapeHtml(post.platform || 'External')} →</a>`
+                    : ''
+                }
+            </div>
+        `;
     }
 
     if (modal) {
@@ -887,13 +946,19 @@ function openBlogReader(id) {
         document.body.style.overflow = 'hidden';
     }
 }
-
 function closeBlogReader() {
     const modal = document.getElementById('blogReaderModal');
     if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
-}
 
+    if (blogReaderOpenedFromCollection) {
+        document.body.classList.add('modal-open');
+    } else {
+        document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
+    }
+
+    blogReaderOpenedFromCollection = false;
+}
 function openBlogReaderFromCollection(id) {
     closeCollectionModal();
     setTimeout(() => openBlogReader(id), 180);
@@ -902,7 +967,27 @@ function openBlogReaderFromCollection(id) {
 function openBlogReaderFromModal(id) {
     openBlogReaderFromCollection(id);
 }
+async function shareBlogPost(id) {
+    const post = blogCache.find(item => Number(item.id) === Number(id));
+    if (!post) return;
 
+    const shareData = {
+        title: post.title || 'Blog Post',
+        text: post.excerpt || post.title,
+        url: post.url || window.location.href
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            showToast('Link copied!');
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
 // ==========================================
 // LIGHTBOX
 // ==========================================
@@ -1416,6 +1501,7 @@ window.openBlogReader = openBlogReader;
 window.closeBlogReader = closeBlogReader;
 window.openBlogReaderFromCollection = openBlogReaderFromCollection;
 window.openBlogReaderFromModal = openBlogReaderFromModal;
+window.shareBlogPost = shareBlogPost;
 
 window.openCollectionModal = openCollectionModal;
 window.closeCollectionModal = closeCollectionModal;

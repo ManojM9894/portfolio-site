@@ -4657,3 +4657,21 @@ MOBILE BLOG POPUP FIX
         align-items: center;
     }
 }
+@media (max-width: 768px) {
+    #gallery .section-header-row,
+    #designs .section-header-row,
+    #blog .section-header-row {
+        position: relative !important;
+        z-index: 20 !important;
+    }
+
+    #gallery .section-view-all,
+    #designs .section-view-all,
+    #blog .section-view-all {
+        position: relative !important;
+        z-index: 25 !important;
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+}

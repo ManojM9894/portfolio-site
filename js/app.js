@@ -1398,9 +1398,16 @@ function initViewAllButtons() {
     const buttons = document.querySelectorAll('[data-collection-type]');
 
     buttons.forEach((button) => {
-        button.addEventListener('click', () => {
+        if (button.dataset.bound === 'true') return;
+        button.dataset.bound = 'true';
+
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
             const type = button.getAttribute('data-collection-type');
             if (!type) return;
+
             openCollectionModal(type);
         });
     });

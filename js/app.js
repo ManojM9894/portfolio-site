@@ -635,7 +635,7 @@ function renderCollectionModalContent(type) {
                 </div>
             `).join('')
             : `<div class="empty-state" style="grid-column:1/-1"><p>No designs yet.</p></div>`;
-    }else if (type === 'blog') {
+                    }else if (type === 'blog') {
     title.textContent = 'All Blog Posts';
     content.className = 'collection-modal-content blog-collection-grid';
 

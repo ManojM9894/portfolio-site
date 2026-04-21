@@ -2897,8 +2897,8 @@ MOBILE BLOG POPUP FIX
     transition: all 0.2s ease !important;
 }
 
-.lightbox-prev { left: -60px !important; }
-.lightbox-next { right: -60px !important; }
+.lightbox-prev { left: 10px !important; }
+.lightbox-next { right: 10px !important; }
 
 .lightbox-nav:hover {
     background: rgba(255,255,255,0.15) !important;
@@ -3254,4 +3254,14 @@ MOBILE BLOG POPUP FIX
         font-size: 0.72rem !important;
         padding: 0.65rem 0.75rem !important;
     }
+}
+/* FIX: allow arrows to be visible */
+.lightbox-content {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    max-width: min(1200px, 100%) !important;
+    width: 100% !important;
+    padding: 0 80px !important; /* 👈 THIS CREATES SPACE FOR ARROWS */
 }

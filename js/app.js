@@ -653,14 +653,14 @@ function renderCollectionModalContent(type) {
                         </button>
                     ` : ''}
                     ${item.url ? `
-                        <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">
+                        <a class="collection-blog-btn" href="${escapeAttr(item.url)}" target="_blank">
                             Open Link
                         </a>
                     ` : ''}
                 </div>
             </div>
         `).join('')
-        : `<div class="empty-state" style="grid-column:1/-1"><p>No blog posts yet.</p></div>`;
+        : `<p>No blog posts</p>`;
 }
 }
 function initCollectionModalSwipe() {

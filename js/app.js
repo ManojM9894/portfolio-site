@@ -1243,6 +1243,18 @@ function initModals() {
     });
 }
 
+function initViewAllButtons() {
+    const buttons = document.querySelectorAll('[data-collection-type]');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const type = button.getAttribute('data-collection-type');
+            if (!type) return;
+            openCollectionModal(type);
+        });
+    });
+}
+
 // ==========================================
 // NAVBAR SCROLL EFFECT
 // ==========================================
@@ -1345,6 +1357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initLightbox();
     initModals();
     initContactForm();
+    initViewAllButtons();
 });
 
 // ==========================================

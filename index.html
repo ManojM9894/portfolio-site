@@ -13,7 +13,6 @@
 </head>
 
 <body>
-    <!-- FULL PAGE INFINITY WATERMARK -->
     <div style="
         position:fixed;
         inset:0;
@@ -26,7 +25,6 @@
         opacity: 0.4;
         mix-blend-mode: screen;"></div>
 
-    <!-- NAVBAR -->
     <nav>
         <a href="#home" class="nav-logo">MM</a>
 
@@ -52,7 +50,6 @@
         <div class="hamburger"><span></span><span></span><span></span></div>
     </nav>
 
-    <!-- HERO -->
     <section id="home">
         <div class="hero-content">
             <div class="hero-greeting">WELCOME TO MY PORTFOLIO</div>
@@ -89,7 +86,6 @@
         </div>
     </section>
 
-    <!-- ART GALLERY -->
     <section id="gallery">
         <div class="section-header-row">
             <div>
@@ -97,13 +93,12 @@
                 <p class="section-subtitle">Original artwork and illustrations</p>
                 <div class="section-divider"></div>
             </div>
-            <button class="section-view-all" onclick="openCollectionModal('gallery')">View All ↗</button>
+            <button class="section-view-all" type="button" data-collection-type="gallery">View All ↗</button>
         </div>
 
         <div id="galleryGrid"></div>
     </section>
 
-    <!-- DESIGNS -->
     <section id="designs">
         <div class="section-header-row">
             <div>
@@ -111,13 +106,12 @@
                 <p class="section-subtitle">Creative designs and visual projects</p>
                 <div class="section-divider"></div>
             </div>
-            <button class="section-view-all" onclick="openCollectionModal('designs')">View All ↗</button>
+            <button class="section-view-all" type="button" data-collection-type="designs">View All ↗</button>
         </div>
 
         <div id="designsGrid"></div>
     </section>
 
-    <!-- BLOG -->
     <section id="blog">
         <div class="section-header-row">
             <div>
@@ -125,16 +119,14 @@
                 <p class="section-subtitle">Thoughts, stories, and articles</p>
                 <div class="section-divider"></div>
             </div>
-            <button class="section-view-all" onclick="openCollectionModal('blog')">View All ↗</button>
+            <button class="section-view-all" type="button" data-collection-type="blog">View All ↗</button>
         </div>
 
         <div id="blogList"></div>
     </section>
 
-    <!-- BLOG READER SECTION -->
     <section id="blogReader" style="display:none;visibility:hidden;height:0;overflow:hidden;padding:0;margin:0;"></section>
 
-    <!-- BLOG READER MODAL -->
     <div id="blogReaderModal"
         style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);overflow-y:auto;padding:2rem 1rem;">
         <div
@@ -163,7 +155,6 @@
         </div>
     </div>
 
-    <!-- GITHUB -->
     <section id="github">
         <div class="section-header-row">
             <div>
@@ -176,7 +167,6 @@
         <div id="githubCards"></div>
     </section>
 
-    <!-- ABOUT -->
     <section id="about">
         <div class="section-header-row">
             <div>
@@ -204,7 +194,6 @@
         </div>
     </section>
 
-    <!-- CONTACT -->
     <section id="contact">
         <div class="contact-grid premium-contact-grid">
             <div class="contact-card premium-contact-card">
@@ -295,7 +284,6 @@
         </div>
     </section>
 
-    <!-- COLLECTION MODAL -->
     <div class="collection-modal" id="collectionModal">
         <div class="collection-modal-backdrop" onclick="closeCollectionModal()"></div>
 
@@ -309,7 +297,6 @@
         </div>
     </div>
 
-    <!-- LIGHTBOX -->
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" type="button" onclick="closeLightbox()">✕</button>
 
@@ -324,10 +311,8 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
-    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./js/supabase-config.js"></script>
     <script src="./js/github.js"></script>

@@ -4712,3 +4712,22 @@ MOBILE BLOG POPUP FIX
         align-items: center;
     }
 }
+.collection-modal,
+#blogReaderModal {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+body.modal-open {
+    position: fixed;
+    width: 100%;
+}
+.reader-share-btn svg {
+    display: block;
+}
+
+.reader-share-btn:hover {
+    transform: scale(1.08);
+}
+
+.reader-share-btn:active {
+    transform: scale(0.95);
+}

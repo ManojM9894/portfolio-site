@@ -898,10 +898,12 @@ async function shareBlogPost(id) {
     const post = blogCache.find(item => Number(item.id) === Number(id));
     if (!post) return;
 
+    const shareUrl = `https://manojmandava.com/post.html?id=${post.id}`;
+
     const shareData = {
         title: post.title || 'Blog Post',
         text: post.excerpt || post.title || 'Check out this post',
-        url: post.url || window.location.href
+        url: shareUrl
     };
 
     try {
@@ -910,10 +912,12 @@ async function shareBlogPost(id) {
             return;
         }
 
-        await navigator.clipboard.writeText(shareData.url);
+        await navigator.clipboard.writeText(shareUrl);
         showToast('🔗 Link copied');
     } catch (error) {
-        console.error('Share failed:', error);
+        if (error?.name !== 'AbortError') {
+            console.error('Share failed:', error);
+        }
     }
 }
 
